@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="description" content="林的训 - 个人健身训练记录">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>林的训</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#151922;--muted:#737b89;--line:#e7e9ee;--accent:#1c8b68;--soft:#e8f5ef;--danger:#c34d4d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:#111827;color:#fff;padding:18px max(16px,calc((100% - 900px)/2));position:sticky;top:0;z-index:5}
+header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:21px;margin:0;font-weight:750;letter-spacing:.3px}.sub{color:#b8c0cc;font-size:12px}
+main{max-width:900px;margin:auto;padding:14px 14px 90px}.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0}.tab,button{border:0;border-radius:12px;padding:10px 14px;background:#e9edf0;color:#27303b;font-weight:650;cursor:pointer}.tab.active,button.primary{background:var(--accent);color:white}.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin:10px 0;box-shadow:0 2px 10px #17203308}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.muted{color:var(--muted);font-size:13px}.big{font-size:28px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#f7f8fa;border-radius:12px;padding:12px}.stat b{display:block;font-size:22px}.action{width:100%;margin-top:8px}.exercise{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}.exercise h3{font-size:16px;margin:0 0 6px}.set{display:grid;grid-template-columns:36px 1fr 1fr auto;gap:7px;align-items:center;margin:7px 0}.set input,.field input,.field select,.field textarea{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;font:inherit}.set input{padding:8px}.set button{padding:8px 10px}.field{display:flex;flex-direction:column;gap:5px;margin:9px 0}.field label{font-size:13px;color:var(--muted)}.pill{font-size:12px;background:var(--soft);color:var(--accent);border-radius:20px;padding:4px 9px}.danger{background:#fff0f0;color:var(--danger)}.timer{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}.hidden{display:none!important}.history-item{border-bottom:1px solid var(--line);padding:10px 0}.small{font-size:12px}.footer-note{font-size:12px;color:var(--muted);text-align:center;padding:18px}
+@media(min-width:650px){main{padding-top:20px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>林的训</h1><div class="sub">简单记录 · 持续进步</div></div><button id="installBtn" class="hidden">安装 App</button></div></header>
+<main>
+<div class="tabs">
+<button class="tab active" data-tab="train">训练</button><button class="tab" data-tab="stats">统计</button><button class="tab" data-tab="body">身体数据</button><button class="tab" data-tab="history">历史</button><button class="tab" data-tab="settings">设置</button>
+</div>
+<section id="train" class="panel active">
+<div class="card">
+<div class="row between"><div><div class="muted">今天训练</div><div class="big" id="sessionTitle">A 日 · 胸肩三头</div></div><select id="planSelect" aria-label="训练计划"><option value="A">A 日</option><option value="B">B 日</option></select></div>
+<div class="row between" style="margin-top:10px"><span class="pill" id="sessionStatus">尚未开始</span><span class="muted" id="elapsed">00:00</span></div>
+<div class="row"><button class="primary" id="startBtn">开始训练</button><button id="finishBtn">结束并保存</button><button id="resetBtn" class="danger">重置本次</button></div>
+</div>
+<div class="card"><div class="row between"><b>组间休息</b><span class="timer" id="timerText">00:00</span></div><div class="row"><select id="restPreset"><option value="60">60 秒</option><option value="90" selected>90 秒</option><option value="120">120 秒</option><option value="150">150 秒</option><option value="180">180 秒</option></select><button id="restStart" class="primary">开始计时</button><button id="restStop">停止</button></div></div>
+<div id="exerciseList"></div>
+<div class="card"><b>添加动作</b><div class="row"><input id="newExercise" placeholder="动作名称" style="flex:1;min-width:120px;padding:10px;border:1px solid var(--line);border-radius:10px"><select id="newPlan"><option value="A">添加到 A 日</option><option value="B">添加到 B 日</option></select><button id="addExercise" class="primary">添加</button></div></div>
+</section>
+<section id="stats" class="panel">
+<div class="grid" id="statsGrid"></div><div class="card"><b>个人最佳 PR</b><div id="prList" class="muted" style="margin-top:8px">完成训练后自动统计</div></div>
+</section>
+<section id="body" class="panel">
+<div class="card"><b>记录身体数据</b><div class="field"><label>日期</label><input id="bodyDate" type="date"></div><div class="grid">
+<div class="field"><label>体重（kg）</label><input id="weight" type="number" step=".1"></div><div class="field"><label>体脂率（%）</label><input id="fat" type="number" step=".1"></div><div class="field"><label>胸围（cm）</label><input id="chest" type="number" step=".1"></div><div class="field"><label>腰围（cm）</label><input id="waist" type="number" step=".1"></div><div class="field"><label>臀围（cm）</label><input id="hip" type="number" step=".1"></div></div><div class="field"><label>备注</label><input id="bodyNote" placeholder="例如：早晨空腹测量"></div><button class="primary action" id="saveBody">保存身体数据</button></div><div class="card"><b>身体数据历史</b><div id="bodyHistory" class="muted"></div></div>
+</section>
+<section id="history" class="panel"><div class="card"><div class="row between"><b>训练历史</b><button id="exportBtn">导出备份</button></div><div id="historyList" class="muted">还没有训练记录</div></div></section>
+<section id="settings" class="panel">
+<div class="card"><b>数据管理</b><p class="muted">数据保存在当前设备、当前浏览器中。手机和电脑不会自动互通。你可以导出 JSON 备份，再在另一台设备导入。</p><button id="exportBtn2" class="primary action">导出全部数据</button><div class="field"><label>导入备份 JSON</label><input type="file" id="importFile" accept=".json,application/json"></div><button id="clearBtn" class="danger action">清空本设备全部数据</button></div>
+<div class="card"><b>安装到桌面</b><p class="muted">安卓：用 Chrome 打开部署网址，菜单中选择“安装应用”或“添加到主屏幕”。Windows：用 Edge/Chrome 打开网址，选择地址栏安装图标或菜单中的“安装此网站为应用”。</p></div>
+</section>
+<div class="footer-note">林的训 · 数据优先保存在本机。建议定期导出备份。</div>
+</main>
+<script>
+const KEY='lin-de-xun-v1';
+const defaults={
+ A:[['平板卧推',3],['上斜哑铃卧推',3],['双杠臂屈伸',2],['器械夹胸',2],['哑铃侧平举',4],['绳索三头下压',2],['保加利亚分腿蹲',3],['动态侧支撑',2]],
+ B:[['引体向上',3],['对握高位下拉',2],['坐姿划船',3],['反向飞鸟',4],['锤式弯举',2],['罗马尼亚硬拉',3],['支撑抬腿',2]]
+};
+let data=load(),session=null,tick=null,restTick=null,restLeft=0,deferredPrompt=null;
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{plans:defaults,logs:[],body:[]}}catch(e){return {plans:defaults,logs:[],body:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function today(){return new Date().toISOString().slice(0,10)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmt(sec){return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function lastSet(name){for(let i=data.logs.length-1;i>=0;i--){let x=data.logs[i].exercises.find(e=>e.name===name);if(x&&x.sets.length)return x.sets[x.sets.length-1]}return null}
+function renderExercises(){
+ const p=document.getElementById('planSelect').value;document.getElementById('sessionTitle').textContent=p+' 日 · '+(p==='A'?'胸肩三头':'背部二头');
+ document.getElementById('exerciseList').innerHTML=(data.plans[p]||[]).map((item,idx)=>{
+ const name=item[0],count=item[1],prev=lastSet(name),sets=session?.plan===p?session.exercises[idx]?.sets:[];
+ return `<div class="exercise"><div class="row between"><div><h3>${esc(name)}</h3><span class="muted">${count} 组 · ${prev?`上次 ${prev.weight??prev.assist??'-'} kg × ${prev.reps??'-'} 次`: '暂无历史数据'}</span></div><button class="danger small" onclick="removeExercise('${p}',${idx})">删除动作</button></div>
+ ${Array.from({length:count},(_,j)=>{let v=sets?.[j]||{};return `<div class="set"><span>${j+1}</span>${name==='引体向上'?`<input type="number" step=".5" placeholder="辅助 kg" aria-label="辅助重量" value="${v.assist??prev?.assist??''}" data-i="${idx}" data-j="${j}" data-k="assist">`:`<input type="number" step=".5" placeholder="重量 kg" aria-label="重量" value="${v.weight??prev?.weight??''}" data-i="${idx}" data-j="${j}" data-k="weight">`}<input type="number" placeholder="次数" aria-label="次数" value="${v.reps??prev?.reps??''}" data-i="${idx}" data-j="${j}" data-k="reps"><button class="${v.done?'primary':''}" onclick="completeSet(${idx},${j})">${v.done?'已完成':'完成'}</button></div>`}).join('')}
+ </div>`}).join('');
+}
+function ensureSession(){if(!session){session={plan:document.getElementById('planSelect').value,start:Date.now(),exercises:(data.plans[document.getElementById('planSelect').value]||[]).map(x=>({name:x[0],sets:[]}))};document.getElementById('sessionStatus').textContent='训练进行中';tick=setInterval(()=>{document.getElementById('elapsed').textContent=fmt(Math.floor((Date.now()-session.start)/1000))},1000)}}
+window.completeSet=(i,j)=>{ensureSession();let inputs=[...document.querySelectorAll(`input[data-i="${i}"][data-j="${j}"]`)];let obj={};inputs.forEach(x=>obj[x.dataset.k]=x.value===''?null:Number(x.value));obj.done=true;session.exercises[i].sets[j]=obj;renderExercises();save();startRest()};
+window.removeExercise=(p,i)=>{if(!confirm('删除这个动作？'))return;data.plans[p].splice(i,1);save();renderExercises()};
+function startRest(){restLeft=Number(document.getElementById('restPreset').value);clearInterval(restTick);document.getElementById('timerText').textContent=fmt(restLeft);restTick=setInterval(()=>{restLeft--;document.getElementById('timerText').textContent=fmt(Math.max(0,restLeft));if(restLeft<=0){clearInterval(restTick);try{navigator.vibrate?.([250,100,250])}catch(e){};alert('休息结束，继续训练！')}},1000)}
+document.getElementById('restStart').onclick=startRest;document.getElementById('restStop').onclick=()=>{clearInterval(restTick);restLeft=0;document.getElementById('timerText').textContent='00:00'};
+document.getElementById('startBtn').onclick=()=>{ensureSession();renderExercises()};
+document.getElementById('finishBtn').onclick=()=>{if(!session){alert('请先开始训练');return}let duration=Math.max(1,Math.round((Date.now()-session.start)/1000));data.logs.push({date:today(),plan:session.plan,duration,exercises:session.exercises.map(e=>({...e,sets:e.sets.filter(Boolean)}))});save();session=null;clearInterval(tick);document.getElementById('elapsed').textContent=fmt(duration);document.getElementById('sessionStatus').textContent='已保存';renderAll();alert('训练已保存！')};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('重置本次训练？未保存的记录会丢失。')){session=null;clearInterval(tick);document.getElementById('elapsed').textContent='00:00';document.getElementById('sessionStatus').textContent='尚未开始';renderExercises()}};
+document.getElementById('planSelect').onchange=()=>{session=null;clearInterval(tick);renderExercises()};
+document.getElementById('addExercise').onclick=()=>{let n=document.getElementById('newExercise').value.trim(),p=document.getElementById('newPlan').value;if(!n)return;data.plans[p].push([n,3]);document.getElementById('newExercise').value='';save();if(document.getElementById('planSelect').value===p)renderExercises()};
+function renderStats(){let total=data.logs.length,mins=Math.round(data.logs.reduce((a,b)=>a+b.duration,0)/60),month=today().slice(0,7),monthly=data.logs.filter(x=>x.date.startsWith(month)),mmin=Math.round(monthly.reduce((a,b)=>a+b.duration,0)/60);document.getElementById('statsGrid').innerHTML=[['累计训练',total+' 次'],['累计时长',mins+' 分钟'],['本月训练',monthly.length+' 次'],['本月时长',mmin+' 分钟']].map(x=>`<div class="stat"><span class="muted">${x[0]}</span><b>${x[1]}</b></div>`).join('');
+ let prs={};data.logs.forEach(log=>log.exercises.forEach(ex=>ex.sets.forEach(s=>{if(!s.done)return;let v=ex.name==='引体向上'?s.assist:s.weight;if(v==null)return;let key=ex.name;if(!prs[key]||(key==='引体向上'?v<prs[key].v:v>prs[key].v))prs[key]={v,reps:s.reps,date:log.date}})));document.getElementById('prList').innerHTML=Object.keys(prs).length?Object.entries(prs).map(([k,v])=>`<div class="history-item"><b>${esc(k)}</b>：${k==='引体向上'?'最低辅助 '+v.v+' kg':'最高 '+v.v+' kg'} · ${v.reps??'-'} 次 <span class="muted">(${v.date})</span></div>`).join(''):'完成训练并记录重量后自动统计';}
+function renderHistory(){document.getElementById('historyList').innerHTML=data.logs.length?[...data.logs].reverse().map(x=>`<div class="history-item"><b>${x.date} · ${x.plan} 日</b><div class="muted">${fmt(x.duration)} · ${x.exercises.length} 个动作 · ${x.exercises.reduce((n,e)=>n+e.sets.length,0)} 组</div>${x.exercises.map(e=>`<div class="small">${esc(e.name)}：${e.sets.map(s=>`${s.assist!=null?'辅助 '+s.assist:s.weight??'-'}kg × ${s.reps??'-'}`).join(' / ')||'未记录组数'}</div>`).join('')}</div>`).join(''):'还没有训练记录'};
+function renderBody(){document.getElementById('bodyDate').value=today();document.getElementById('bodyHistory').innerHTML=data.body.length?[...data.body].reverse().map(x=>`<div class="history-item">${x.date} · 体重 ${x.weight??'-'} kg · 体脂 ${x.fat??'-'}% · 腰围 ${x.waist??'-'} cm <div class="small">${esc(x.note||'')}</div></div>`).join(''):'暂无身体数据'}
+function renderAll(){renderExercises();renderStats();renderHistory();renderBody()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')});
+document.getElementById('saveBody').onclick=()=>{let x={date:document.getElementById('bodyDate').value||today(),weight:num('weight'),fat:num('fat'),chest:num('chest'),waist:num('waist'),hip:num('hip'),note:document.getElementById('bodyNote').value};data.body=data.body.filter(y=>y.date!==x.date);data.body.push(x);save();renderBody();alert('身体数据已保存')};
+function num(id){let v=document.getElementById(id).value;return v===''?null:Number(v)}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='林的训-备份-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
+document.getElementById('exportBtn').onclick=exportData;document.getElementById('exportBtn2').onclick=exportData;
+document.getElementById('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.logs||!x.plans||!x.body)throw Error();if(confirm('导入会覆盖本设备现有数据，确定继续？')){data=x;save();renderAll();alert('导入成功')}}catch(err){alert('文件格式不正确')}e.target.value=''};
+document.getElementById('clearBtn').onclick=()=>{if(confirm('确定清空本设备全部训练数据？建议先导出备份。')){localStorage.removeItem(KEY);data=load();renderAll()}};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').classList.remove('hidden')});
+document.getElementById('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}};
+renderAll();
+</script>
+</body></html>
