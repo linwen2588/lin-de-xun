@@ -1,98 +1,1102 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<meta name="description" content="林的训 - 个人健身训练记录">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>林的训</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--ink:#151922;--muted:#737b89;--line:#e7e9ee;--accent:#1c8b68;--soft:#e8f5ef;--danger:#c34d4d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-header{background:#111827;color:#fff;padding:18px max(16px,calc((100% - 900px)/2));position:sticky;top:0;z-index:5}
-header .top{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:21px;margin:0;font-weight:750;letter-spacing:.3px}.sub{color:#b8c0cc;font-size:12px}
-main{max-width:900px;margin:auto;padding:14px 14px 90px}.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0}.tab,button{border:0;border-radius:12px;padding:10px 14px;background:#e9edf0;color:#27303b;font-weight:650;cursor:pointer}.tab.active,button.primary{background:var(--accent);color:white}.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin:10px 0;box-shadow:0 2px 10px #17203308}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.muted{color:var(--muted);font-size:13px}.big{font-size:28px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#f7f8fa;border-radius:12px;padding:12px}.stat b{display:block;font-size:22px}.action{width:100%;margin-top:8px}.exercise{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}.exercise h3{font-size:16px;margin:0 0 6px}.set{display:grid;grid-template-columns:36px 1fr 1fr auto;gap:7px;align-items:center;margin:7px 0}.set input,.field input,.field select,.field textarea{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;font:inherit}.set input{padding:8px}.set button{padding:8px 10px}.field{display:flex;flex-direction:column;gap:5px;margin:9px 0}.field label{font-size:13px;color:var(--muted)}.pill{font-size:12px;background:var(--soft);color:var(--accent);border-radius:20px;padding:4px 9px}.danger{background:#fff0f0;color:var(--danger)}.timer{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}.hidden{display:none!important}.history-item{border-bottom:1px solid var(--line);padding:10px 0}.small{font-size:12px}.footer-note{font-size:12px;color:var(--muted);text-align:center;padding:18px}
-@media(min-width:650px){main{padding-top:20px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-</style>
-</head>
-<body>
-<header><div class="top"><div><h1>林的训</h1><div class="sub">简单记录 · 持续进步</div></div><button id="installBtn" class="hidden">安装 App</button></div></header>
-<main>
-<div class="tabs">
-<button class="tab active" data-tab="train">训练</button><button class="tab" data-tab="stats">统计</button><button class="tab" data-tab="body">身体数据</button><button class="tab" data-tab="history">历史</button><button class="tab" data-tab="settings">设置</button>
-</div>
-<section id="train" class="panel active">
-<div class="card">
-<div class="row between"><div><div class="muted">今天训练</div><div class="big" id="sessionTitle">A 日 · 胸肩三头</div></div><select id="planSelect" aria-label="训练计划"><option value="A">A 日</option><option value="B">B 日</option></select></div>
-<div class="row between" style="margin-top:10px"><span class="pill" id="sessionStatus">尚未开始</span><span class="muted" id="elapsed">00:00</span></div>
-<div class="row"><button class="primary" id="startBtn">开始训练</button><button id="finishBtn">结束并保存</button><button id="resetBtn" class="danger">重置本次</button></div>
-</div>
-<div class="card"><div class="row between"><b>组间休息</b><span class="timer" id="timerText">00:00</span></div><div class="row"><select id="restPreset"><option value="60">60 秒</option><option value="90" selected>90 秒</option><option value="120">120 秒</option><option value="150">150 秒</option><option value="180">180 秒</option></select><button id="restStart" class="primary">开始计时</button><button id="restStop">停止</button></div></div>
-<div id="exerciseList"></div>
-<div class="card"><b>添加动作</b><div class="row"><input id="newExercise" placeholder="动作名称" style="flex:1;min-width:120px;padding:10px;border:1px solid var(--line);border-radius:10px"><select id="newPlan"><option value="A">添加到 A 日</option><option value="B">添加到 B 日</option></select><button id="addExercise" class="primary">添加</button></div></div>
-</section>
-<section id="stats" class="panel">
-<div class="grid" id="statsGrid"></div><div class="card"><b>个人最佳 PR</b><div id="prList" class="muted" style="margin-top:8px">完成训练后自动统计</div></div>
-</section>
-<section id="body" class="panel">
-<div class="card"><b>记录身体数据</b><div class="field"><label>日期</label><input id="bodyDate" type="date"></div><div class="grid">
-<div class="field"><label>体重（kg）</label><input id="weight" type="number" step=".1"></div><div class="field"><label>体脂率（%）</label><input id="fat" type="number" step=".1"></div><div class="field"><label>胸围（cm）</label><input id="chest" type="number" step=".1"></div><div class="field"><label>腰围（cm）</label><input id="waist" type="number" step=".1"></div><div class="field"><label>臀围（cm）</label><input id="hip" type="number" step=".1"></div></div><div class="field"><label>备注</label><input id="bodyNote" placeholder="例如：早晨空腹测量"></div><button class="primary action" id="saveBody">保存身体数据</button></div><div class="card"><b>身体数据历史</b><div id="bodyHistory" class="muted"></div></div>
-</section>
-<section id="history" class="panel"><div class="card"><div class="row between"><b>训练历史</b><button id="exportBtn">导出备份</button></div><div id="historyList" class="muted">还没有训练记录</div></div></section>
-<section id="settings" class="panel">
-<div class="card"><b>数据管理</b><p class="muted">数据保存在当前设备、当前浏览器中。手机和电脑不会自动互通。你可以导出 JSON 备份，再在另一台设备导入。</p><button id="exportBtn2" class="primary action">导出全部数据</button><div class="field"><label>导入备份 JSON</label><input type="file" id="importFile" accept=".json,application/json"></div><button id="clearBtn" class="danger action">清空本设备全部数据</button></div>
-<div class="card"><b>安装到桌面</b><p class="muted">安卓：用 Chrome 打开部署网址，菜单中选择“安装应用”或“添加到主屏幕”。Windows：用 Edge/Chrome 打开网址，选择地址栏安装图标或菜单中的“安装此网站为应用”。</p></div>
-</section>
-<div class="footer-note">林的训 · 数据优先保存在本机。建议定期导出备份。</div>
-</main>
-<script>
-const KEY='lin-de-xun-v1';
-const defaults={
- A:[['平板卧推',3],['上斜哑铃卧推',3],['双杠臂屈伸',2],['器械夹胸',2],['哑铃侧平举',4],['绳索三头下压',2],['保加利亚分腿蹲',3],['动态侧支撑',2]],
- B:[['引体向上',3],['对握高位下拉',2],['坐姿划船',3],['反向飞鸟',4],['锤式弯举',2],['罗马尼亚硬拉',3],['支撑抬腿',2]]
-};
-let data=load(),session=null,tick=null,restTick=null,restLeft=0,deferredPrompt=null;
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||{plans:defaults,logs:[],body:[]}}catch(e){return {plans:defaults,logs:[],body:[]}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(data))}
-function today(){return new Date().toISOString().slice(0,10)}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function fmt(sec){return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
-function lastSet(name){for(let i=data.logs.length-1;i>=0;i--){let x=data.logs[i].exercises.find(e=>e.name===name);if(x&&x.sets.length)return x.sets[x.sets.length-1]}return null}
-function renderExercises(){
- const p=document.getElementById('planSelect').value;document.getElementById('sessionTitle').textContent=p+' 日 · '+(p==='A'?'胸肩三头':'背部二头');
- document.getElementById('exerciseList').innerHTML=(data.plans[p]||[]).map((item,idx)=>{
- const name=item[0],count=item[1],prev=lastSet(name),sets=session?.plan===p?session.exercises[idx]?.sets:[];
- return `<div class="exercise"><div class="row between"><div><h3>${esc(name)}</h3><span class="muted">${count} 组 · ${prev?`上次 ${prev.weight??prev.assist??'-'} kg × ${prev.reps??'-'} 次`: '暂无历史数据'}</span></div><button class="danger small" onclick="removeExercise('${p}',${idx})">删除动作</button></div>
- ${Array.from({length:count},(_,j)=>{let v=sets?.[j]||{};return `<div class="set"><span>${j+1}</span>${name==='引体向上'?`<input type="number" step=".5" placeholder="辅助 kg" aria-label="辅助重量" value="${v.assist??prev?.assist??''}" data-i="${idx}" data-j="${j}" data-k="assist">`:`<input type="number" step=".5" placeholder="重量 kg" aria-label="重量" value="${v.weight??prev?.weight??''}" data-i="${idx}" data-j="${j}" data-k="weight">`}<input type="number" placeholder="次数" aria-label="次数" value="${v.reps??prev?.reps??''}" data-i="${idx}" data-j="${j}" data-k="reps"><button class="${v.done?'primary':''}" onclick="completeSet(${idx},${j})">${v.done?'已完成':'完成'}</button></div>`}).join('')}
- </div>`}).join('');
+.bodybox{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}.bodygrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bodybox input{width:100%;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface2)}
+/* Layout: one phone-width column, sticky header, fixed 4-tab bar, rest-timer dock floating above the bar.
+   Weight-plate discs mark sets. Plate colours carry meaning: blue = action, green = done, yellow = rest, red = delete. */
+:root{
+  --bg:#ECEEF3; --surface:#FFFFFF; --surface2:#F3F5F9; --ink:#12161E; --ink2:#586072;
+  --line:#DADFE8; --line2:#BFC7D6;
+  --accent:#2354D6; --accent-ink:#FFFFFF; --accent-soft:#E2E9FC; --bar:#B9C8F3;
+  --good:#1E8E55; --good-ink:#FFFFFF; --good-soft:#DCF2E6;
+  --warn:#B97A00; --warn-soft:#FFF0C9;
+  --bad:#C93428; --bad-soft:#FCE4E1;
+  --scrim:rgba(10,14,22,.5);
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Noto Sans SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
 }
-function ensureSession(){if(!session){session={plan:document.getElementById('planSelect').value,start:Date.now(),exercises:(data.plans[document.getElementById('planSelect').value]||[]).map(x=>({name:x[0],sets:[]}))};document.getElementById('sessionStatus').textContent='训练进行中';tick=setInterval(()=>{document.getElementById('elapsed').textContent=fmt(Math.floor((Date.now()-session.start)/1000))},1000)}}
-window.completeSet=(i,j)=>{ensureSession();let inputs=[...document.querySelectorAll(`input[data-i="${i}"][data-j="${j}"]`)];let obj={};inputs.forEach(x=>obj[x.dataset.k]=x.value===''?null:Number(x.value));obj.done=true;session.exercises[i].sets[j]=obj;renderExercises();save();startRest()};
-window.removeExercise=(p,i)=>{if(!confirm('删除这个动作？'))return;data.plans[p].splice(i,1);save();renderExercises()};
-function startRest(){restLeft=Number(document.getElementById('restPreset').value);clearInterval(restTick);document.getElementById('timerText').textContent=fmt(restLeft);restTick=setInterval(()=>{restLeft--;document.getElementById('timerText').textContent=fmt(Math.max(0,restLeft));if(restLeft<=0){clearInterval(restTick);try{navigator.vibrate?.([250,100,250])}catch(e){};alert('休息结束，继续训练！')}},1000)}
-document.getElementById('restStart').onclick=startRest;document.getElementById('restStop').onclick=()=>{clearInterval(restTick);restLeft=0;document.getElementById('timerText').textContent='00:00'};
-document.getElementById('startBtn').onclick=()=>{ensureSession();renderExercises()};
-document.getElementById('finishBtn').onclick=()=>{if(!session){alert('请先开始训练');return}let duration=Math.max(1,Math.round((Date.now()-session.start)/1000));data.logs.push({date:today(),plan:session.plan,duration,exercises:session.exercises.map(e=>({...e,sets:e.sets.filter(Boolean)}))});save();session=null;clearInterval(tick);document.getElementById('elapsed').textContent=fmt(duration);document.getElementById('sessionStatus').textContent='已保存';renderAll();alert('训练已保存！')};
-document.getElementById('resetBtn').onclick=()=>{if(confirm('重置本次训练？未保存的记录会丢失。')){session=null;clearInterval(tick);document.getElementById('elapsed').textContent='00:00';document.getElementById('sessionStatus').textContent='尚未开始';renderExercises()}};
-document.getElementById('planSelect').onchange=()=>{session=null;clearInterval(tick);renderExercises()};
-document.getElementById('addExercise').onclick=()=>{let n=document.getElementById('newExercise').value.trim(),p=document.getElementById('newPlan').value;if(!n)return;data.plans[p].push([n,3]);document.getElementById('newExercise').value='';save();if(document.getElementById('planSelect').value===p)renderExercises()};
-function renderStats(){let total=data.logs.length,mins=Math.round(data.logs.reduce((a,b)=>a+b.duration,0)/60),month=today().slice(0,7),monthly=data.logs.filter(x=>x.date.startsWith(month)),mmin=Math.round(monthly.reduce((a,b)=>a+b.duration,0)/60);document.getElementById('statsGrid').innerHTML=[['累计训练',total+' 次'],['累计时长',mins+' 分钟'],['本月训练',monthly.length+' 次'],['本月时长',mmin+' 分钟']].map(x=>`<div class="stat"><span class="muted">${x[0]}</span><b>${x[1]}</b></div>`).join('');
- let prs={};data.logs.forEach(log=>log.exercises.forEach(ex=>ex.sets.forEach(s=>{if(!s.done)return;let v=ex.name==='引体向上'?s.assist:s.weight;if(v==null)return;let key=ex.name;if(!prs[key]||(key==='引体向上'?v<prs[key].v:v>prs[key].v))prs[key]={v,reps:s.reps,date:log.date}})));document.getElementById('prList').innerHTML=Object.keys(prs).length?Object.entries(prs).map(([k,v])=>`<div class="history-item"><b>${esc(k)}</b>：${k==='引体向上'?'最低辅助 '+v.v+' kg':'最高 '+v.v+' kg'} · ${v.reps??'-'} 次 <span class="muted">(${v.date})</span></div>`).join(''):'完成训练并记录重量后自动统计';}
-function renderHistory(){document.getElementById('historyList').innerHTML=data.logs.length?[...data.logs].reverse().map(x=>`<div class="history-item"><b>${x.date} · ${x.plan} 日</b><div class="muted">${fmt(x.duration)} · ${x.exercises.length} 个动作 · ${x.exercises.reduce((n,e)=>n+e.sets.length,0)} 组</div>${x.exercises.map(e=>`<div class="small">${esc(e.name)}：${e.sets.map(s=>`${s.assist!=null?'辅助 '+s.assist:s.weight??'-'}kg × ${s.reps??'-'}`).join(' / ')||'未记录组数'}</div>`).join('')}</div>`).join(''):'还没有训练记录'};
-function renderBody(){document.getElementById('bodyDate').value=today();document.getElementById('bodyHistory').innerHTML=data.body.length?[...data.body].reverse().map(x=>`<div class="history-item">${x.date} · 体重 ${x.weight??'-'} kg · 体脂 ${x.fat??'-'}% · 腰围 ${x.waist??'-'} cm <div class="small">${esc(x.note||'')}</div></div>`).join(''):'暂无身体数据'}
-function renderAll(){renderExercises();renderStats();renderHistory();renderBody()}
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')});
-document.getElementById('saveBody').onclick=()=>{let x={date:document.getElementById('bodyDate').value||today(),weight:num('weight'),fat:num('fat'),chest:num('chest'),waist:num('waist'),hip:num('hip'),note:document.getElementById('bodyNote').value};data.body=data.body.filter(y=>y.date!==x.date);data.body.push(x);save();renderBody();alert('身体数据已保存')};
-function num(id){let v=document.getElementById(id).value;return v===''?null:Number(v)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='林的训-备份-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
-document.getElementById('exportBtn').onclick=exportData;document.getElementById('exportBtn2').onclick=exportData;
-document.getElementById('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.logs||!x.plans||!x.body)throw Error();if(confirm('导入会覆盖本设备现有数据，确定继续？')){data=x;save();renderAll();alert('导入成功')}}catch(err){alert('文件格式不正确')}e.target.value=''};
-document.getElementById('clearBtn').onclick=()=>{if(confirm('确定清空本设备全部训练数据？建议先导出备份。')){localStorage.removeItem(KEY);data=load();renderAll()}};
-if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').classList.remove('hidden')});
-document.getElementById('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}};
-renderAll();
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1116; --surface:#171B23; --surface2:#202632; --ink:#E9EDF4; --ink2:#9AA3B5;
+    --line:#2A3140; --line2:#3A4357;
+    --accent:#7499FF; --accent-ink:#0B1330; --accent-soft:#1B2A52; --bar:#31456F;
+    --good:#4CC98A; --good-ink:#08241A; --good-soft:#143127;
+    --warn:#F2B73C; --warn-soft:#3A2D0F;
+    --bad:#FF7B6E; --bad-soft:#3E1D1A;
+    --scrim:rgba(0,0,0,.62);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1116; --surface:#171B23; --surface2:#202632; --ink:#E9EDF4; --ink2:#9AA3B5;
+  --line:#2A3140; --line2:#3A4357;
+  --accent:#7499FF; --accent-ink:#0B1330; --accent-soft:#1B2A52; --bar:#31456F;
+  --good:#4CC98A; --good-ink:#08241A; --good-soft:#143127;
+  --warn:#F2B73C; --warn-soft:#3A2D0F;
+  --bad:#FF7B6E; --bad-soft:#3E1D1A;
+  --scrim:rgba(0,0,0,.62);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  font-variant-numeric:tabular-nums;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:560px;margin:0 auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--bg);display:flex;align-items:center;justify-content:space-between;height:54px}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;letter-spacing:.02em}
+.brand svg{width:26px;height:26px}
+.live{font-size:12px;font-weight:700;color:var(--good);background:var(--good-soft);border-radius:99px;padding:3px 10px}
+.icon{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center}
+.icon svg,.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+main{padding-bottom:210px}
+h1{margin:4px 0 16px;font-size:32px;line-height:1.15;font-weight:800;letter-spacing:-.01em;text-wrap:balance}
+h2.sec{margin:26px 0 10px;font-size:14px;font-weight:700;color:var(--ink2);display:flex;justify-content:space-between;gap:12px;letter-spacing:.04em}
+h2.sec span{font-weight:500;letter-spacing:0}
+.k{font-size:12px;color:var(--ink2);letter-spacing:.06em}
+.empty{padding:28px 8px;text-align:center;color:var(--ink2);text-wrap:balance}
+
+.btn{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn small{font-weight:500;font-size:12px;opacity:.8}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.big{min-height:58px;font-size:18px;font-weight:700;width:100%}
+.btn.sm{min-height:38px;padding:0 12px;font-size:14px}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.add{width:100%;border-style:dashed;border-color:var(--line2);background:transparent;color:var(--ink2);margin:2px 0 14px}
+.btn.fin{margin-top:6px}
+
+.hero{display:grid;gap:12px;padding-top:12px}
+.hero .btn small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero .btn:not(.primary){flex-direction:column;gap:2px;padding:10px 16px;min-height:56px}
+.wk{margin-top:18px;display:flex;gap:10px}
+.wk div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.wk .v{display:block;font-size:22px;line-height:1.3;font-weight:800}
+.wk .v small{font-size:12px;font-weight:600;color:var(--ink2);margin:0 3px 0 1px}
+.say{margin:0;color:var(--ink2);font-size:14px;line-height:1.5}
+.hero .say{margin:-6px 0 0;font-size:15px}
+.cheer{background:var(--accent-soft);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;line-height:1.5}
+.srch{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:16px;margin:10px 0 0}
+.pstick{position:sticky;top:0;z-index:2;margin:-18px 0 0;padding:18px 0 10px;background:var(--surface)}
+.pstick .srch{background:var(--surface2);margin-top:10px}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.rowm{flex:1;min-width:0;display:grid}
+.rowm span{font-size:12.5px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.sum{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:end;margin:6px 0 16px}
+.sum .big{font-size:40px;line-height:1;font-weight:800;letter-spacing:-.02em}
+.sum .mid{font-size:15px;color:var(--ink2);text-align:right}
+.sum .mid b{font-size:26px;color:var(--ink)}
+.bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;display:grid;gap:14px}
+.ex.fin{border-color:var(--good)}
+.ex-h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ex-n{font-size:19px;font-weight:700;line-height:1.25}
+.tag{display:inline-block;margin-left:8px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--ink2);vertical-align:2px}
+.tag.ok{background:var(--good-soft);color:var(--good)}
+.last{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.remain{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.remain .n{font-size:44px;line-height:1;font-weight:800;letter-spacing:-.02em}
+.remain .n small{font-size:14px;font-weight:600;color:var(--ink2);margin-left:6px;letter-spacing:0}
+.tgt{display:flex;gap:6px;align-items:center;color:var(--ink2);font-size:12px}
+.tgt button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface2);font-size:20px;line-height:1}
+.plates{display:flex;gap:6px;flex-wrap:wrap}
+.disc{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink2);border:2px solid var(--line2);box-shadow:inset 0 0 0 3px var(--surface)}
+.disc.next{border-color:var(--accent);color:var(--accent)}
+.disc.done{background:var(--good);border-color:var(--good);color:var(--good-ink)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.fld{min-width:0}
+.fld label{display:block;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.stp{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface2)}
+.stp button{width:46px;border:0;background:transparent;font-size:22px;color:var(--ink)}
+.stp button:active{background:var(--line)}
+.stp input{flex:1;min-width:0;width:100%;border:0;background:transparent;text-align:center;font-size:22px;font-weight:800;padding:10px 0}
+.acts{display:grid;grid-template-columns:1fr auto;gap:8px}
+.acts .btn:first-child{min-height:56px;font-size:17px;font-weight:700;flex-direction:column;gap:2px}
+.slog{display:flex;flex-wrap:wrap;gap:6px}
+.sc{font-size:13px;background:var(--surface2);border-radius:8px;padding:4px 8px;display:inline-flex;gap:6px;align-items:center}
+.sc em{font-style:normal;font-size:10.5px;font-weight:800;background:var(--warn-soft);color:var(--warn);border-radius:5px;padding:1px 5px}
+.rest{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rest>span{font-size:12px;color:var(--ink2);margin-right:2px}
+.chip{min-width:42px;height:34px;border-radius:99px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:13px;font-weight:600}
+.chip.on{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.restin{width:64px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);text-align:center;font-size:16px}
+.rmv{border:0;background:transparent;color:var(--ink2);font-size:13px;min-height:38px;padding:0 8px;border-radius:8px}
+
+.dockw{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:19;display:flex;justify-content:center;padding:0 max(12px,env(safe-area-inset-left,0px)) 0 max(12px,env(safe-area-inset-right,0px));pointer-events:none}
+.dk{pointer-events:auto;width:100%;max-width:560px;background:var(--surface);border:1px solid var(--warn);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.22);overflow:hidden}
+.dk-bar{height:5px;background:var(--warn-soft)}
+.dk-bar i{display:block;height:100%;width:100%;background:var(--warn)}
+.dk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px}
+.dk-main{min-width:0}
+.dk-l{font-size:12.5px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-t{font-size:34px;line-height:1.1;font-weight:800;letter-spacing:-.01em}
+.dk-btns{display:flex;gap:6px;flex:none}
+.dk.up{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dk.up .dk-l{color:var(--accent-ink);opacity:.85}
+.dk.up .dk-bar{background:transparent}
+.dk.up .btn{background:transparent;color:var(--accent-ink);border-color:var(--accent-ink)}
+.dk.up .btn.skip{background:var(--accent-ink);color:var(--accent)}
+.dk.up{animation:pulse 1s ease-in-out 3}
+@keyframes pulse{50%{transform:scale(1.02)}}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+.tabs .in{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tabs button{border:0;background:transparent;display:grid;justify-items:center;gap:2px;padding:6px 0 4px;border-radius:12px;color:var(--ink2);font-size:11.5px;font-weight:600}
+.tabs button.on{color:var(--accent)}
+
+#sheet{position:fixed;inset:0;z-index:50}
+.scrim{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.panel{width:100%;max-width:560px;max-height:90%;overflow:auto;background:var(--surface);border-radius:22px 22px 0 0;
+  padding:18px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:14px;align-content:start}
+.panel h3{margin:0;font-size:20px;font-weight:800}
+.panel p{margin:0;color:var(--ink2);font-size:13.5px}
+.panel label.l{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:4px}
+.panel input[type=text],.panel input[type=number],.panel select{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;font-size:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0}
+.seg span{display:grid;place-items:center;height:44px;border-radius:12px;border:1px solid var(--line);font-size:13.5px;font-weight:600;background:var(--surface2)}
+.seg input:checked+span{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.pick{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;min-height:50px;padding:6px 12px;margin-bottom:6px}
+.pick .tg{font-size:12px;color:var(--ink2)}
+.pick.added{background:var(--good-soft);border-color:var(--good)}
+.pick.added .tg{color:var(--good);font-weight:700}
+.grp{font-size:12px;font-weight:700;color:var(--ink2);margin:10px 0 6px;letter-spacing:.06em}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px}
+.tog input{width:22px;height:22px;accent-color:var(--accent)}
+.note{font-size:12.5px;color:var(--ink2);background:var(--surface2);border-radius:10px;padding:10px 12px}
+.ghost{background:transparent}
+
+.sess{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.sess-h{width:100%;border:0;background:transparent;text-align:left;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.sess-h b{font-size:16px}
+.sess-h .dur{font-size:17px;font-weight:800;text-align:right}
+.sess-h .sub{grid-column:1/-1;font-size:12.5px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-d{padding:2px 14px 14px;display:grid;gap:12px;border-top:1px solid var(--line)}
+.di{display:grid;gap:6px;padding-top:10px}
+.di b{font-size:14px}
+.sess-a{display:flex;gap:8px;justify-content:flex-end}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.tile .v{font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+.tile .v small{font-size:13px;font-weight:600;color:var(--ink2);margin:0 4px 0 2px;letter-spacing:0}
+.tile .d{font-size:12px;color:var(--ink2);margin-top:2px}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:2px 0 12px}
+.mnav b{font-size:18px}
+.mnav .btn{min-width:46px;padding:0}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .w{font-size:11px;color:var(--ink2);text-align:center;padding-bottom:2px}
+.cal .c{aspect-ratio:1/1;max-width:100%;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-size:13px;color:var(--ink2)}
+.cal .c.e{background:transparent;border-color:transparent}
+.cal .c.l1{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--ink)}
+.cal .c.l2{background:var(--bar);border-color:var(--bar);color:var(--ink);font-weight:700}
+.cal .c.l3{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:800}
+.cal .c.today{outline:2px solid var(--ink);outline-offset:1px}
+.legend{display:flex;gap:10px;align-items:center;justify-content:flex-end;font-size:11.5px;color:var(--ink2);margin-top:8px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-3px;margin-right:3px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 8px 6px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .cap{font-size:12px;color:var(--ink2);padding:0 8px 6px}
+svg .grid{stroke:var(--line);stroke-width:1;fill:none}
+svg .ax{fill:var(--ink2);font-size:10px;font-family:var(--sans)}
+svg .axv{fill:var(--ink);font-size:10px;font-weight:700;font-family:var(--sans)}
+svg .ln{stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linejoin:round;stroke-linecap:round}
+svg .pt{fill:var(--accent)}
+svg .pt.last{stroke:var(--surface);stroke-width:2}
+svg .bar1{fill:var(--bar)}
+svg .bar1.sel{fill:var(--accent)}
+svg [data-act]{cursor:pointer}
+.sel-ex{margin-bottom:10px}
+.sel-ex select{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:16px}
+.prog{display:flex;gap:10px;margin-top:10px}
+.prog .tile{flex:1}
+.prog .tile .v{font-size:20px}
+.hist{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.hist div{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;font-size:13.5px}
+.hist div+div{border-top:1px solid var(--line)}
+.hist span:first-child{color:var(--ink2)}
+
+
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 18px}
+.plan-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:9px;min-height:158px;color:var(--ink)}
+.plan-card .plan-mark{width:34px;height:34px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:17px}
+.plan-card b{font-size:18px}.plan-card small{color:var(--ink2);line-height:1.5}.plan-card .plan-foot{margin-top:auto;color:var(--accent);font-weight:700;font-size:13px}
+.plan-tools{display:flex;gap:8px;align-items:center;margin:8px 0 18px}.plan-tools .btn{flex:1}
+.plan-row{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.plan-row input{width:20px;height:20px;accent-color:var(--accent)}.plan-row .rowm{flex:1;min-width:0}
+@media(max-width:380px){.plan-grid{gap:8px}.plan-card{padding:13px}}
+
+#toast{position:fixed;left:50%;bottom:calc(176px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:88%;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.dk.up{animation:none}.bar i{transition:none}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="var(--accent)"/><circle cx="14" cy="14" r="9" fill="none" stroke="var(--accent-ink)" stroke-width="1.5" opacity=".55"/><circle cx="14" cy="14" r="3.2" fill="var(--bg)"/></svg>
+      林的训<span class="live" id="live" hidden>训练中</span>
+    </div>
+    <button class="icon" data-act="settings" aria-label="设置"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="dockw"><div id="dock" style="width:100%;max-width:560px" hidden></div></div>
+<nav class="tabs" aria-label="主导航"><div class="in">
+  <button data-act="tab" data-t="train"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>训练</button>
+  <button data-act="tab" data-t="log"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>记录</button>
+  <button data-act="tab" data-t="stats"><svg viewBox="0 0 24 24"><path d="M5 20v-9M12 20V4M19 20v-6"/></svg>统计</button>
+  <button data-act="tab" data-t="lib"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>动作</button>
+</div></nav>
+<div id="sheet" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var uid=function(){return Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3)};
+var num=function(v){v=parseFloat(v);return isNaN(v)?0:v};
+var fmtNum=function(n){n=+n;if(isNaN(n))return '0';return String(Math.round(n*100)/100)};
+var clone=function(o){return JSON.parse(JSON.stringify(o))};
+var GROUPS=['胸','背','腿','肩','手臂','核心','有氧','其他'];
+var TYPES={weight:'负重',assist:'辅助',bw:'自重',time:'计时'};
+var WD=['日','一','二','三','四','五','六'];
+var hasWeight=function(t){return t==='weight'||t==='assist'};
+
+/* ---------- 日期与格式 ---------- */
+var p2=function(n){return String(n).padStart(2,'0')};
+var mk=function(ts){var d=new Date(ts);return d.getFullYear()+'-'+p2(d.getMonth()+1)};
+var ymd=function(ts){var d=new Date(ts);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+var fmtDate=function(ts){var d=new Date(ts);return (d.getMonth()+1)+'月'+d.getDate()+'日 周'+WD[d.getDay()]};
+var mdate=function(ts){var d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()};
+var fmtTime=function(ts){var d=new Date(ts);return p2(d.getHours())+':'+p2(d.getMinutes())};
+var ymLabel=function(k){var a=k.split('-');return a[0]+'年'+(+a[1])+'月'};
+var shiftMonth=function(k,d){var a=k.split('-').map(Number);return mk(new Date(a[0],a[1]-1+d,1).getTime())};
+function fmtDur(sec){var m=Math.round(sec/60);if(m<1)return '不到1分钟';if(m<60)return m+'分钟';var h=Math.floor(m/60),r=m%60;return r?h+'小时'+r+'分':h+'小时'}
+function durHtml(sec){var m=Math.round(sec/60);if(m<60)return '<b>'+m+'</b><small>分钟</small>';var h=Math.floor(m/60),r=m%60;return '<b>'+h+'</b><small>时</small><b>'+r+'</b><small>分</small>'}
+function fmtClock(sec){sec=Math.max(0,Math.floor(sec));var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;return h?h+':'+p2(m)+':'+p2(s):p2(m)+':'+p2(s)}
+function fmtSet(type,s){var w=fmtNum(s.w);if(type==='weight')return w+'kg × '+s.r;if(type==='assist')return '辅助 '+w+'kg × '+s.r;if(type==='bw')return s.r+' 次';if(type==='time')return s.r+' 秒';return ''}
+
+/* ---------- 数据 ---------- */
+function presets(){return [
+  {id:'p-pullup',name:'引体向上',group:'背',type:'assist',sets:4,reps:8,w:80,rest:120,step:5},
+  {id:'p-bench',name:'杠铃卧推',group:'胸',type:'weight',sets:4,reps:8,w:40,rest:120,step:2.5},
+  {id:'p-squat',name:'深蹲',group:'腿',type:'weight',sets:4,reps:8,w:40,rest:150,step:2.5},
+  {id:'p-dead',name:'硬拉',group:'背',type:'weight',sets:3,reps:5,w:60,rest:180,step:2.5},
+  {id:'p-ohp',name:'哑铃推举',group:'肩',type:'weight',sets:3,reps:10,w:10,rest:90,step:1},
+  {id:'p-row',name:'杠铃划船',group:'背',type:'weight',sets:4,reps:8,w:40,rest:90,step:2.5},
+  {id:'p-pushup',name:'俯卧撑',group:'胸',type:'bw',sets:3,reps:15,w:0,rest:60,step:1},
+  {id:'p-dip',name:'双杠臂屈伸',group:'手臂',type:'bw',sets:3,reps:10,w:0,rest:90,step:1},
+  {id:'p-plank',name:'平板支撑',group:'核心',type:'time',sets:3,reps:60,w:0,rest:45,step:1}
+]}
+function X(id,name,group,type,sets,reps,w,rest,step){return {id:'p-'+id,name:name,group:group,type:type,sets:sets,reps:reps,w:w,rest:rest,step:step}}
+function presetsV2(){return [
+  X('incline','杠铃上斜卧推','胸','weight',4,8,30,120,2.5),
+  X('dbbench','哑铃卧推','胸','weight',3,10,16,90,2.5),
+  X('dbincline','哑铃上斜卧推','胸','weight',3,10,14,90,2.5),
+  X('dbfly','哑铃飞鸟','胸','weight',3,12,8,60,1),
+  X('cablefly','龙门架夹胸','胸','weight',3,12,15,60,5),
+  X('chestpress','器械推胸','胸','weight',3,10,30,90,5),
+  X('latpd','高位下拉','背','weight',4,10,40,90,5),
+  X('seatedrow','坐姿划船','背','weight',3,10,40,90,5),
+  X('dbrow','单臂哑铃划船','背','weight',3,10,16,90,2.5),
+  X('tbar','T杠划船','背','weight',3,10,30,90,2.5),
+  X('straightarm','直臂下压','背','weight',3,12,20,60,2.5),
+  X('pullupbw','自重引体向上','背','bw',4,6,0,120,1),
+  X('chinup','反手引体向上','背','assist',4,8,60,120,5),
+  X('hyper','山羊挺身','背','bw',3,15,0,60,1),
+  X('frontsquat','前蹲','腿','weight',3,8,30,150,2.5),
+  X('legpress','腿举','腿','weight',4,12,80,120,10),
+  X('rdl','罗马尼亚硬拉','腿','weight',3,10,40,120,2.5),
+  X('bulgarian','保加利亚分腿蹲','腿','weight',3,10,10,90,2.5),
+  X('lunge','箭步蹲','腿','weight',3,10,10,90,2.5),
+  X('legext','腿屈伸','腿','weight',3,12,30,60,5),
+  X('legcurl','腿弯举','腿','weight',3,12,25,60,5),
+  X('hipthrust','杠铃臀推','腿','weight',4,10,60,90,5),
+  X('calf','站姿提踵','腿','weight',4,15,40,60,5),
+  X('goblet','高脚杯深蹲','腿','weight',3,12,16,90,2.5),
+  X('barohp','杠铃推举','肩','weight',4,8,30,120,2.5),
+  X('lateral','哑铃侧平举','肩','weight',3,12,6,60,1),
+  X('reardelt','俯身反向飞鸟','肩','weight',3,12,5,60,1),
+  X('facepull','绳索面拉','肩','weight',3,15,20,60,5),
+  X('arnold','阿诺德推举','肩','weight',3,10,12,90,2.5),
+  X('shoulderpress','器械推肩','肩','weight',3,10,30,90,5),
+  X('barcurl','杠铃弯举','手臂','weight',3,10,20,75,2.5),
+  X('dbcurl','哑铃弯举','手臂','weight',3,12,8,60,1),
+  X('hammer','锤式弯举','手臂','weight',3,12,8,60,1),
+  X('pushdown','绳索下压','手臂','weight',3,12,25,60,5),
+  X('skull','仰卧臂屈伸','手臂','weight',3,10,15,75,2.5),
+  X('closebench','窄距卧推','手臂','weight',3,8,30,90,2.5),
+  X('crunch','卷腹','核心','bw',3,20,0,45,1),
+  X('legraise','悬垂举腿','核心','bw',3,10,0,60,1),
+  X('russian','俄罗斯转体','核心','bw',3,20,0,45,1),
+  X('sideplank','侧平板支撑','核心','time',3,30,0,30,1),
+  X('treadmill','跑步机','有氧','time',1,1200,0,0,1),
+  X('rope','跳绳','有氧','time',3,120,0,60,1),
+  X('rower','划船机','有氧','time',1,900,0,0,1),
+  X('bike','动感单车','有氧','time',1,1200,0,0,1)
+]}
+function allPresets(){return presets().concat(presetsV2())}
+var PV=2,migrated=false;
+function normalize(meta,sess){
+  meta=meta||{};
+  var s={v:1,
+    exercises:Array.isArray(meta.exercises)?meta.exercises:allPresets(),
+    templates:Array.isArray(meta.templates)?meta.templates:[],
+    settings:Object.assign({sound:true,vibrate:true},meta.settings||{}),
+    active:meta.active||null,
+    pv:Array.isArray(meta.exercises)?(meta.pv||1):PV,
+    sessions:(sess||[]).slice().sort(function(a,b){return b.start-a.start})};
+  if(s.pv<PV){
+    var have={};s.exercises.forEach(function(e){have[e.id]=1});
+    presetsV2().forEach(function(p){if(!have[p.id])s.exercises.push(p)});
+    s.pv=PV;migrated=true;
+  }
+  return s;
+}
+var LS='lin-de-xun-pro-v2';
+var state=normalize(null,[]);
+var hadLocal=false;
+try{var raw=localStorage.getItem(LS);if(raw){var o=JSON.parse(raw);state=normalize(o.meta,o.sessions);hadLocal=true}}catch(e){}
+
+// 兼容旧版「林的训」数据：保留旧 key，并把训练历史迁移到新版结构。
+if(!hadLocal){
+  try{
+    var old=JSON.parse(localStorage.getItem('lin-de-xun-v1')||'null');
+    if(old&&Array.isArray(old.logs)){
+      var exMap={};
+      (old.logs||[]).forEach(function(log,li){
+        var items=[];(log.exercises||[]).forEach(function(ex){
+          var id='legacy-'+ex.name.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g,'');
+          var assist=ex.name==='引体向上';
+          if(!exMap[id]){exMap[id]=1;state.exercises.push({id:id,name:ex.name,group:(/胸|卧推|夹胸/.test(ex.name)?'胸':/腿|深蹲|硬拉/.test(ex.name)?'腿':/肩/.test(ex.name)?'肩':/腹|支撑/.test(ex.name)?'核心':'背'),type:assist?'assist':'weight',sets:Math.max(1,ex.sets&&ex.sets.length||3),reps:10,w:0,rest:90,step:2.5})}
+          var sets=(ex.sets||[]).filter(function(x){return x&&x.done!==false}).map(function(x,k){var q={r:Number(x.reps)||0,t:Date.now()+li*1000+k};if(assist)q.w=Number(x.assist)||0;else q.w=Number(x.weight)||0;return q}).filter(function(x){return x.r>0});
+          if(sets.length)items.push({exId:id,name:ex.name,group:'其他',type:assist?'assist':'weight',sets:sets});
+        });
+        if(items.length){var ts=Date.parse((log.date||new Date().toISOString().slice(0,10))+'T12:00:00');state.sessions.push({id:'legacy-'+li+'-'+ts,start:ts,end:ts+(Number(log.duration)||0)*1000,dur:Number(log.duration)||0,note:'从旧版林的训迁移',items:items})}
+      });
+      state.sessions.sort(function(a,b){return b.start-a.start});
+      state.body=Array.isArray(old.body)?old.body:[];
+      hadLocal=true;localStorage.setItem(LS,JSON.stringify({meta:{v:1,pv:state.pv,exercises:state.exercises,templates:state.templates,settings:state.settings,active:state.active,body:state.body},sessions:state.sessions}));
+    }
+  }catch(e){}
+}
+state.body=Array.isArray(state.body)?state.body:[];
+var metaOf=function(){return {v:1,pv:state.pv,exercises:state.exercises,templates:state.templates,settings:state.settings,active:state.active,body:state.body}};
+var ui={tab:'train',month:mk(Date.now()),exSel:null,open:{},sync:'local'};
+var store={col:null,dirty:false};
+var caps={dl:null};
+
+function persistLocal(){try{localStorage.setItem(LS,JSON.stringify({meta:metaOf(),sessions:state.sessions}))}catch(e){}}
+var tLocal=null,tMeta=null,metaBusy=false,metaAgain=false;
+function touch(){
+  store.dirty=true;
+  clearTimeout(tLocal);tLocal=setTimeout(persistLocal,250);
+  clearTimeout(tMeta);tMeta=setTimeout(flushMeta,700);
+}
+function flushMeta(){
+  if(!store.col)return;
+  if(metaBusy){metaAgain=true;return}
+  metaBusy=true;
+  store.col.doc('meta').set(clone(metaOf())).then(function(){ui.sync='cloud'}).catch(function(){ui.sync='err'}).then(function(){
+    metaBusy=false;if(metaAgain){metaAgain=false;flushMeta()}
+  });
+}
+function putSession(s){
+  persistLocal();
+  if(store.col)store.col.doc('s_'+s.id).set(clone(s)).catch(function(){ui.sync='err'});
+}
+function delSession(id){
+  persistLocal();
+  if(store.col)store.col.doc('s_'+id).delete().catch(function(){ui.sync='err'});
+}
+window.addEventListener('pagehide',function(){persistLocal()});
+
+function withTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},ms)})])}
+function initStore(){
+  var C=window.claude;
+  if(!C||!C.use){return}
+  Promise.all([C.use('db'),C.use('user'),C.use('downloads')]).then(function(r){
+    caps.dl=r[2]||null;
+    var db=r[0],user=r[1];
+    if(!db||!user)return;
+    return user.id().then(function(id){
+      if(!id)return;
+      var col=db.collection('data/users/'+id);
+      return withTimeout(col.limit(1000).get(),9000).then(function(snap){
+        var meta=null,rs=[];
+        snap.docs.forEach(function(d){var v=d.data();if(!v)return;if(d.id==='meta')meta=clone(v);else if(d.id.indexOf('s_')===0)rs.push(clone(v))});
+        var remoteHas=!!meta||rs.length>0;
+        var ids={};rs.forEach(function(s){ids[s.id]=1});
+        if(remoteHas&&!store.dirty){state=normalize(meta,rs);if(migrated){store.dirty=true;migrated=false}}
+        else if(remoteHas&&store.dirty){
+          state.sessions.forEach(function(s){ids[s.id]=ids[s.id]||0});
+          var have={};state.sessions.forEach(function(s){have[s.id]=1});
+          rs.forEach(function(s){if(!have[s.id])state.sessions.push(s)});
+          state.sessions.sort(function(a,b){return b.start-a.start});
+        }
+        store.col=col;ui.sync='cloud';
+        var up=[];
+        if(!meta||store.dirty)up.push(col.doc('meta').set(clone(metaOf())));
+        var remoteIds={};rs.forEach(function(s){remoteIds[s.id]=1});
+        state.sessions.forEach(function(s){if(!remoteIds[s.id])up.push(col.doc('s_'+s.id).set(clone(s)))});
+        persistLocal();
+        render();
+        return Promise.all(up).catch(function(){ui.sync='err'});
+      });
+    });
+  }).catch(function(){ui.sync=store.col?'err':'local'});
+}
+
+// 首次使用时提供 A/B 两套默认训练计划；已有自定义计划不会被覆盖。
+function ensureDefaultPlans(){
+  var defs=[
+    {id:'plan-a-default',name:'训练 A',kind:'default',desc:'胸部 · 肩部 · 三头 · 下肢功能',items:[['p-bench',3],['p-dbincline',3],['p-dip',2],['p-cablefly',2],['p-lateral',4],['p-pushdown',2],['p-bulgarian',3],['p-sideplank',2]]},
+    {id:'plan-b-default',name:'训练 B',kind:'default',desc:'背部 · 后束 · 二头 · 腿后侧 · 核心',items:[['p-pullup',3],['p-latpd',2],['p-seatedrow',3],['p-reardelt',4],['p-hammer',2],['p-rdl',3],['p-crunch',2]]}
+  ];
+  defs.forEach(function(d){if(!state.templates.some(function(t){return t.id===d.id})){state.templates.unshift({id:d.id,name:d.name,kind:'default',desc:d.desc,items:d.items.filter(function(x){return state.exercises.some(function(e){return e.id===x[0]})}).map(function(x){return {exId:x[0],sets:x[1]}})})}});
+}
+ensureDefaultPlans();
+
+/* ---------- 成绩与比较 ---------- */
+function scoreOf(type,s){if(type==='weight')return s.w*1000+s.r;if(type==='assist')return -s.w*1000+s.r;return s.r}
+function bestOf(type,sets){var b=null,bs=-Infinity;sets.forEach(function(s){var sc=scoreOf(type,s);if(sc>bs){bs=sc;b=s}});return b}
+function lastPerf(exId){
+  for(var i=0;i<state.sessions.length;i++){
+    var s=state.sessions[i];
+    for(var j=0;j<s.items.length;j++){var it=s.items[j];if(it.exId===exId&&it.sets.length)return {start:s.start,sets:it.sets}}
+  }
+  return null;
+}
+function histBest(exId,type){
+  var all=[];
+  state.sessions.forEach(function(s){s.items.forEach(function(it){if(it.exId===exId)it.sets.forEach(function(x){all.push(x)})})});
+  return all.length?bestOf(type,all):null;
+}
+function sessStats(s){var sets=0,vol=0;s.items.forEach(function(it){sets+=it.sets.length;if(it.type==='weight')it.sets.forEach(function(x){vol+=x.w*x.r})});return {sets:sets,vol:vol}}
+
+/* ---------- 训练流程 ---------- */
+function makeItem(ex,count){
+  var lp=lastPerf(ex.id),w=ex.w||0,r=ex.reps||10;
+  if(lp){var ls=lp.sets[lp.sets.length-1];if(ls){if(hasWeight(ex.type))w=ls.w;r=ls.r}}
+  return {id:uid(),exId:ex.id,name:ex.name,group:ex.group,type:ex.type,step:ex.step||2.5,target:count||ex.sets||3,sets:[],w:w,r:r,rest:ex.rest==null?90:ex.rest};
+}
+function exFromSnap(it){
+  var ex=state.exercises.filter(function(e){return e.id===it.exId})[0];
+  return ex||{id:it.exId,name:it.name,group:it.group,type:it.type,sets:it.sets?it.sets.length:3,reps:10,w:0,rest:90,step:2.5};
+}
+function startWorkout(items){state.active={start:Date.now(),items:items,rest:null};ui.tab='train';touch();render();window.scrollTo(0,0)}
+function completeSet(i){
+  var a=state.active,it=a.items[i];
+  var s={r:num(it.r),t:Date.now()};
+  if(hasWeight(it.type))s.w=num(it.w);
+  if(!(s.r>0)){toast(it.type==='time'?'秒数要大于 0':'次数要大于 0');return}
+  var hb=histBest(it.exId,it.type);
+  var prevAll=it.sets.slice();if(hb)prevAll.push(hb);
+  var isPR=false;
+  if(hb){var best=bestOf(it.type,prevAll);isPR=scoreOf(it.type,s)>scoreOf(it.type,best)}
+  if(isPR)s.pr=true;
+  it.sets.push(s);
+  if(it.target<it.sets.length)it.target=it.sets.length;
+  if(it.rest>0)a.rest={end:Date.now()+it.rest*1000,total:it.rest,name:it.name};
+  alertedEnd=0;resetTitle();
+  touch();render();
+  var rem2=Math.max(0,it.target-it.sets.length);
+  if(isPR)toast('新纪录！'+fmtSet(it.type,s)+'，又突破了自己');
+  else if(a.items.every(function(x){return x.sets.length>=x.target}))toast('动作都练完了，漂亮！可以结束训练');
+  else toast(setSay(rem2,it.sets.length));
+}
+
+/* ---------- 提示 ---------- */
+var actx=null,alertedEnd=0;
+function unlockAudio(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){}}
+function beep(){
+  if(!actx)return;
+  try{
+    var t=actx.currentTime;
+    [0,0.3,0.6].forEach(function(d,i){
+      var o=actx.createOscillator(),g=actx.createGain();
+      o.type='sine';o.frequency.value=i===2?1175:880;
+      g.gain.setValueAtTime(0.0001,t+d);g.gain.exponentialRampToValueAtTime(0.4,t+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.22);
+      o.connect(g);g.connect(actx.destination);o.start(t+d);o.stop(t+d+0.25);
+    });
+  }catch(e){}
+}
+function fireAlert(){
+  if(state.settings.sound)beep();
+  if(state.settings.vibrate){try{if(navigator.vibrate)navigator.vibrate([250,120,250,120,500])}catch(e){}}
+  if(document.hidden)document.title='休息结束 · 林的训';
+}
+function resetTitle(){if(document.title!=='林的训')document.title='林的训'}
+var toastT=null;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on')},2400)}
+var wl=null;
+function syncWake(){
+  try{
+    if(state.active&&document.visibilityState==='visible'&&navigator.wakeLock){
+      if(!wl){navigator.wakeLock.request('screen').then(function(l){wl=l;l.addEventListener('release',function(){wl=null})}).catch(function(){})}
+    }else if(wl){wl.release();wl=null}
+  }catch(e){wl=null}
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  var a=state.active;
+  var el=$('#elapsed');if(el&&a)el.textContent=fmtClock((Date.now()-a.start)/1000);
+  var r=a&&a.rest;if(!r)return;
+  var t=$('#dk-t');if(!t)return;
+  var now=Date.now(),leftMs=r.end-now,box=$('#dock .dk'),lab=$('#dk-l'),skip=$('#dk-skip'),fill=$('#dk-fill');
+  if(leftMs>0){
+    t.textContent=fmtClock(Math.ceil(leftMs/1000));
+    fill.style.width=Math.max(0,Math.min(100,leftMs/(r.total*10)))+'%';
+    box.classList.remove('up');lab.textContent='休息中 · '+r.name;skip.textContent='跳过';
+  }else{
+    t.textContent='+'+fmtClock((now-r.end)/1000);
+    fill.style.width='0%';
+    box.classList.add('up');lab.textContent='休息结束，开始下一组 · '+r.name;skip.textContent='好';
+    if(alertedEnd!==r.end){alertedEnd=r.end;if(now-r.end<8000)fireAlert()}
+  }
+}
+function renderDock(){
+  var d=$('#dock'),r=state.active&&state.active.rest;
+  if(!r){d.hidden=true;d.innerHTML='';return}
+  d.hidden=false;
+  d.innerHTML='<div class="dk"><div class="dk-bar"><i id="dk-fill"></i></div><div class="dk-row"><div class="dk-main"><div class="dk-l" id="dk-l"></div><div class="dk-t" id="dk-t">00:00</div></div><div class="dk-btns"><button class="btn sm" data-act="rest-adj" data-d="-15">−15</button><button class="btn sm" data-act="rest-adj" data-d="15">+15</button><button class="btn sm skip" id="dk-skip" data-act="rest-skip">跳过</button></div></div></div>';
+}
+
+/* ---------- 训练页 ---------- */
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function dayPick(a){return a[new Date().getDate()%a.length]}
+function idleSay(){
+  var now=Date.now(),last=state.sessions[0],md=monthData(mk(now));
+  if(!last)return dayPick(['第一次从简单的动作开始就好，重要的是开始。','先练一组试试，动起来就赢了一半。']);
+  if(ymd(last.start)===ymd(now))return dayPick(['今天已经练过了，吃好睡好，肌肉是在休息时长出来的。','今天的训练已完成，想再加一组也行，量力而行。']);
+  var gap=Math.floor((now-last.start)/86400000);
+  if(gap>=7)return dayPick(['隔了几天没关系，今天轻松练一点就算回来了。','回来就好，从熟悉的动作开始。']);
+  if(md.n>=8)return '本月已经练了 '+md.n+' 次，节奏很稳，继续保持。';
+  if(md.n>=1)return dayPick(['本月已经练了 '+md.n+' 次，今天再来一次。','坚持比强度更重要，今天也来练一练。','每一次出现在训练里，都是在给自己加分。']);
+  return dayPick(['新的一个月，从今天这一练开始。','今天练完，这个月就有第一条记录了。']);
+}
+function progressSay(pct,dn){
+  if(dn===0)return '先把第一组做标准，后面的就顺了。';
+  if(pct>=100)return '全部练完了，辛苦了，可以结束训练。';
+  if(pct>=75)return '快收尾了，最后几组守住动作质量。';
+  if(pct>=50)return '过半了，状态不错，继续。';
+  return '已经开始了，一组一组来。';
+}
+function setSay(rem,done){
+  if(rem===0)return rnd(['这个动作完成了，漂亮！','拿下，这个动作搞定。']);
+  if(rem===1)return rnd(['最后一组，稳稳做完！','只剩一组了，收个漂亮的尾。']);
+  return rnd(['第 '+done+' 组完成，还剩 '+rem+' 组。','很稳，休息好再来。','节奏不错，继续。']);
+}
+function monthSay(key,md,prev,cur){
+  if(!md.n)return key===cur?'这个月还没开始，今天练一次就算开张。':'';
+  var lab=key===cur?'这个月':(+key.slice(5))+'月';
+  var s=md.n>=12?lab+'练了 '+md.n+' 次，训练已经成了你的习惯。':md.n>=4?lab+'练了 '+md.n+' 次，节奏很稳。':lab+'练了 '+md.n+' 次，继续保持。';
+  if(prev.dur&&md.dur>prev.dur)s+=' 比上个月多练了 '+fmtDur(md.dur-prev.dur)+'，进步看得见。';
+  return s;
+}
+function finishSay(done,mins){
+  var n=monthData(mk(Date.now())).n+1;
+  var s=n===1?'这个月的第一次训练，开了个好头。':'这是这个月第 '+n+' 次训练，坚持的人才看得到变化。';
+  return '辛苦了！'+mins+' 分钟完成 '+done+' 组。'+s;
+}
+function milestoneSay(){
+  var n=state.sessions.length;
+  if([1,10,25,50,100,200,365].indexOf(n)>=0)return n===1?'第一次训练记录下来了！':'累计第 '+n+' 次训练，值得庆祝。';
+  return rnd(['辛苦了，好好休息。','今天又比昨天强一点。','做到了，这就是坚持。']);
+}
+function pickRow(e,inS){
+  var on=inS[e.id];
+  return '<button class="pick'+(on?' added':'')+'" data-act="pick" data-id="'+e.id+'" data-q="'+esc((e.name+' '+(e.group||'')+' '+TYPES[e.type]).toLowerCase())+'"'+(on?' disabled':'')+'><span class="rowm"><b>'+esc(e.name)+'</b><span>'+e.sets+' 组 · '+TYPES[e.type]+'</span></span><span class="tg">'+(on?'已添加':'添加')+'</span></button>';
+}
+function recentRows(inS){
+  var seen={},ids=[];
+  state.sessions.forEach(function(s){s.items.forEach(function(it){if(ids.length<6&&!seen[it.exId]){seen[it.exId]=1;ids.push(it.exId)}})});
+  var list=ids.map(function(id){return state.exercises.filter(function(e){return e.id===id})[0]}).filter(Boolean);
+  if(!list.length)return '';
+  return '<div class="grp">最近练过</div>'+list.map(function(e){return pickRow(e,inS)}).join('');
+}
+function applyFilter(t){
+  var q=t.value.trim().toLowerCase(),root=t.closest('.panel')||$('#view');
+  root.querySelectorAll('[data-q]').forEach(function(r){r.hidden=!!q&&r.dataset.q.indexOf(q)<0});
+  root.querySelectorAll('.grp,h2.sec[data-g]').forEach(function(h){
+    var n=h.nextElementSibling,any=false;
+    while(n&&!n.classList.contains('grp')&&!n.matches('h2.sec')){if(n.dataset.q!==undefined&&!n.hidden)any=true;n=n.nextElementSibling}
+    h.hidden=!!q&&!any;
+  });
+}
+function idle(){
+  var mo=monthData(mk(Date.now()));
+  var plans=state.templates.slice();
+  var h='<section class="hero"><div><div class="k">'+fmtDate(Date.now())+'</div><h1>今天准备练什么？</h1><p class="say">选一个训练计划开始，或者按今天的状态自定义训练。</p></div></section>';
+  h+='<h2 class="sec">我的训练计划</h2><div class="plan-grid">';
+  plans.forEach(function(t,i){
+    var names=t.items.map(function(it){var ex=state.exercises.filter(function(e){return e.id===it.exId})[0];return ex?ex.name:it.name||''}).filter(Boolean);
+    var label=t.desc||names.slice(0,3).join(' · ')+(names.length>3?' 等 '+names.length+' 个动作':'');
+    h+='<button class="plan-card" data-act="tmpl" data-id="'+t.id+'"><span class="plan-mark">'+(t.name==='训练 A'?'A':t.name==='训练 B'?'B':'＋')+'</span><b>'+esc(t.name)+'</b><small>'+esc(label||'还没有添加动作')+'</small><span class="plan-foot">开始训练 →</span></button>';
+  });
+  h+='</div><div class="plan-tools"><button class="btn" data-act="newplan">＋ 自定义训练计划</button><button class="btn" data-act="manageplans">管理</button></div>';
+  h+='<section class="wk"><div><span class="k">本月训练</span><span class="v"><b>'+mo.n+'</b><small>次</small></span></div><div><span class="k">本月时长</span><span class="v">'+durHtml(mo.dur)+'</span></div></section>';
+  var last=state.sessions[0];
+  if(last)h+='<button class="btn" style="width:100%;margin-top:12px" data-act="repeat">重复上次训练<small>'+esc(last.items.map(function(i){return i.name}).join('、'))+'</small></button>';
+  return h;
+}
+function openPlanBuilder(){
+  ui.planDraft=[];
+  var h='<h3>创建训练计划</h3><p>给计划起个名字，再选择要安排的动作。</p><label class="l" for="plan-name">计划名称</label><input id="plan-name" maxlength="24" placeholder="例如：推日、拉日、全身训练">';
+  h+='<input type="text" id="plan-q" class="srch" placeholder="搜索动作" autocomplete="off">';
+  GROUPS.forEach(function(g){var list=state.exercises.filter(function(e){return (e.group||'其他')===g});if(!list.length)return;h+='<div class="grp">'+g+'</div>'+list.map(function(e){return '<label class="plan-row" data-q="'+esc((e.name+' '+g).toLowerCase())+'"><input type="checkbox" data-act="plancheck" data-id="'+e.id+'"><span class="rowm"><b>'+esc(e.name)+'</b><span>'+e.sets+' 组 · '+TYPES[e.type]+'</span></span></label>'}).join('')});
+  h+='<button class="btn primary big" data-act="saveplan">保存训练计划</button><button class="btn" data-act="close">取消</button>';
+  openSheet(h);
+}
+function managePlans(){
+  var h='<h3>管理训练计划</h3><p>默认的训练 A、训练 B 可以保留；自定义计划可以删除。</p>';
+  state.templates.forEach(function(t){h+='<div class="row"><div class="rowm"><b>'+esc(t.name)+'</b><span>'+t.items.length+' 个动作'+(t.kind==='default'?' · 默认计划':' · 自定义')+'</span></div>'+(t.kind==='default'?'':'<button class="btn sm danger" data-act="tmpldel" data-id="'+t.id+'">删除</button>')+'</div>'});
+  h+='<button class="btn" data-act="close">完成</button>';openSheet(h);
+}
+
+function field(i,k,label,val){
+  return '<div class="fld"><label for="in-'+i+'-'+k+'">'+label+'</label><div class="stp">'+
+    '<button data-act="adj" data-i="'+i+'" data-k="'+k+'" data-d="-1" aria-label="减少">−</button>'+
+    '<input id="in-'+i+'-'+k+'" data-i="'+i+'" data-k="'+k+'" inputmode="decimal" value="'+fmtNum(val)+'">'+
+    '<button data-act="adj" data-i="'+i+'" data-k="'+k+'" data-d="1" aria-label="增加">＋</button></div></div>';
+}
+function card(it,i){
+  var n=Math.max(it.target,it.sets.length),rem=Math.max(0,it.target-it.sets.length),fin=it.sets.length>0&&rem===0;
+  var lp=lastPerf(it.exId);
+  var lastTxt=lp?'上次 '+mdate(lp.start)+'　'+lp.sets.map(function(s){return fmtSet(it.type,s)}).join('　'):'第一次练这个动作';
+  var discs='';
+  for(var k=0;k<n;k++){discs+='<span class="'+(k<it.sets.length?'disc done':(k===it.sets.length?'disc next':'disc'))+'">'+(k+1)+'</span>'}
+  var fields=(hasWeight(it.type)?field(i,'w',it.type==='assist'?'辅助重量 kg':'重量 kg',it.w):'')+field(i,'r',it.type==='time'?'秒数':'次数',it.r);
+  var chips=[30,45,60,90,120,180].map(function(v){return '<button class="chip'+(it.rest===v?' on':'')+'" data-act="rest" data-i="'+i+'" data-v="'+v+'">'+v+'</button>'}).join('');
+  var log=it.sets.length?'<div class="slog">'+it.sets.map(function(s,k){return '<span class="sc">'+(k+1)+'　'+esc(fmtSet(it.type,s))+(s.pr?'<em>PR</em>':'')+'</span>'}).join('')+'</div>':'';
+  return '<article class="ex'+(fin?' fin':'')+'" id="card-'+i+'">'+
+    '<div class="ex-h"><div><span class="ex-n">'+esc(it.name)+'</span><span class="tag'+(fin?' ok':'')+'">'+(fin?'已完成':esc(it.group||TYPES[it.type]))+'</span><div class="last">'+esc(lastTxt)+'</div></div>'+
+    '<button class="rmv" data-act="rmitem" data-i="'+i+'">移除</button></div>'+
+    '<div class="remain"><div class="n">'+rem+'<small>组剩余</small></div><div class="tgt">目标 '+it.target+' 组<button data-act="tgt" data-i="'+i+'" data-d="-1" aria-label="目标减一组">−</button><button data-act="tgt" data-i="'+i+'" data-d="1" aria-label="目标加一组">＋</button></div></div>'+
+    '<div class="plates">'+discs+'</div>'+
+    '<div class="fields">'+fields+'</div>'+
+    '<div class="acts"><button class="btn'+(rem>0?' primary':'')+'" data-act="done" data-i="'+i+'">'+(rem>0?'完成一组<small>剩余 '+rem+' → '+(rem-1)+'</small>':'再加一组<small>已完成 '+it.sets.length+' 组</small>')+'</button>'+
+    '<button class="btn" data-act="undo" data-i="'+i+'"'+(it.sets.length?'':' disabled')+'>撤销</button></div>'+
+    log+
+    '<div class="rest"><span>休息间隔 (秒)</span>'+chips+'<input class="restin" data-i="'+i+'" data-k="rest" inputmode="numeric" value="'+it.rest+'" aria-label="自定义休息秒数"></div>'+
+  '</article>';
+}
+function viewTrain(){
+  var a=state.active;
+  if(!a)return idle();
+  var tot=0,dn=0;a.items.forEach(function(i){tot+=Math.max(i.target,i.sets.length);dn+=i.sets.length});
+  var pct=tot?Math.round(dn/tot*100):0;
+  var h='<section class="sum"><div><div class="k">训练时间</div><div class="big" id="elapsed">0:00</div></div><div class="mid"><div class="k">已完成</div><b>'+dn+'</b> / '+tot+' 组</div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><div class="say" style="grid-column:1/-1">'+esc(progressSay(pct,dn))+'</div></section>';
+  if(!a.items.length)h+='<div class="empty">还没有动作，点下面的“添加动作”开始。</div>';
+  h+=a.items.map(card).join('');
+  h+='<button class="btn add" data-act="additem">＋ 添加动作</button>';
+  h+='<button class="btn primary big fin" data-act="finish">结束训练</button>';
+  return h;
+}
+
+/* ---------- 记录页 ---------- */
+function sessCard(s){
+  var st=sessStats(s),open=ui.open[s.id];
+  var h='<div class="sess"><button class="sess-h" data-act="toggle" data-id="'+s.id+'" aria-expanded="'+(!!open)+'"><b>'+fmtDate(s.start)+' · '+fmtTime(s.start)+'</b><span class="dur">'+fmtDur(s.dur)+'</span><span class="sub">'+s.items.length+' 个动作 · '+st.sets+' 组'+(st.vol?' · 总量 '+Math.round(st.vol).toLocaleString('en-US')+'kg':'')+'　'+esc(s.items.map(function(i){return i.name}).join('、'))+'</span></button>';
+  if(open){
+    h+='<div class="sess-d">'+s.items.map(function(it){
+      return '<div class="di"><b>'+esc(it.name)+'</b><div class="slog">'+it.sets.map(function(x,k){return '<span class="sc">'+(k+1)+'　'+esc(fmtSet(it.type,x))+(x.pr?'<em>PR</em>':'')+'</span>'}).join('')+'</div></div>';
+    }).join('');
+    if(s.note)h+='<div class="note">'+esc(s.note)+'</div>';
+    h+='<div class="sess-a"><button class="btn sm danger" data-act="delsess" data-id="'+s.id+'">删除</button><button class="btn sm primary" data-act="again" data-id="'+s.id+'">再练一次</button></div></div>';
+  }
+  return h+'</div>';
+}
+function viewLog(){
+  if(!state.sessions.length)return '<div class="empty">还没有训练记录。<br>练完点“结束训练”，这里会按月份列出每一次训练。</div>';
+  var by={},order=[];
+  state.sessions.forEach(function(s){var k=mk(s.start);if(!by[k]){by[k]=[];order.push(k)}by[k].push(s)});
+  return order.map(function(k){
+    var tot=by[k].reduce(function(n,s){return n+s.dur},0);
+    return '<h2 class="sec">'+ymLabel(k)+'<span>'+by[k].length+' 次 · '+fmtDur(tot)+'</span></h2>'+by[k].map(sessCard).join('');
+  }).join('');
+}
+
+/* ---------- 统计页 ---------- */
+function monthData(key){
+  var list=state.sessions.filter(function(s){return mk(s.start)===key});
+  var dur=0,sets=0,days={};
+  list.forEach(function(s){dur+=s.dur;sets+=sessStats(s).sets;var d=new Date(s.start).getDate();days[d]=(days[d]||0)+s.dur});
+  return {n:list.length,dur:dur,sets:sets,days:days};
+}
+function niceStep(raw){var p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p}
+function barChart(keys,vals,sel){
+  var W=360,H=160,L=8,R=8,T=20,B=24,n=keys.length,slot=(W-L-R)/n,bw=Math.min(24,slot-8),max=Math.max.apply(null,vals.concat([1]));
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="近12个月训练时长"><line class="grid" x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'"/>';
+  keys.forEach(function(k,i){
+    var v=vals[i],h=v>0?Math.max(3,(H-T-B)*v/max):2,x=L+slot*i+(slot-bw)/2,y=H-B-h,isSel=k===sel;
+    s+='<rect class="bar1'+(isSel?' sel':'')+'" x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw+'" height="'+h.toFixed(1)+'" rx="4"/>';
+    if(v>0)s+='<text class="'+(isSel?'axv':'ax')+'" x="'+(x+bw/2).toFixed(1)+'" y="'+(y-4).toFixed(1)+'" text-anchor="middle">'+(Math.round(v/360)/10)+'</text>';
+    s+='<text class="'+(isSel?'axv':'ax')+'" x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+(+k.slice(5))+'</text>';
+    s+='<rect x="'+(L+slot*i).toFixed(1)+'" y="'+T+'" width="'+slot.toFixed(1)+'" height="'+(H-T-B)+'" fill="transparent" data-act="pickmonth" data-k="'+k+'"/>';
+  });
+  return s+'</svg>';
+}
+function lineChart(pts,invert){
+  var W=360,H=190,L=38,R=16,T=18,B=26;
+  var ys=pts.map(function(p){return p.y}),lo=Math.min.apply(null,ys),hi=Math.max.apply(null,ys);
+  if(lo===hi){lo-=1;hi+=1}
+  var step=niceStep((hi-lo)/3);lo=Math.floor(lo/step+1e-9)*step;hi=Math.ceil(hi/step-1e-9)*step;
+  var X=function(i){return pts.length===1?L+(W-L-R)/2:L+(W-L-R)*i/(pts.length-1)};
+  var Y=function(v){var t=(v-lo)/(hi-lo);return invert?T+(H-T-B)*t:H-B-(H-T-B)*t};
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="动作进步曲线">';
+  for(var v=lo;v<=hi+1e-9;v+=step){var y=Y(v).toFixed(1);s+='<line class="grid" x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'"/><text class="ax" x="'+(L-6)+'" y="'+(+y+3.5)+'" text-anchor="end">'+fmtNum(+v.toFixed(2))+'</text>'}
+  var d=pts.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.y).toFixed(1)}).join(' ');
+  if(pts.length>1)s+='<path class="ln" d="'+d+'"/>';
+  pts.forEach(function(p,i){var last=i===pts.length-1;s+='<circle class="pt'+(last?' last':'')+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="'+(last?5:3.2)+'"/>'});
+  var lp=pts[pts.length-1];
+  s+='<text class="axv" x="'+X(pts.length-1).toFixed(1)+'" y="'+(Y(lp.y)-9).toFixed(1)+'" text-anchor="'+(pts.length>1?'end':'middle')+'">'+fmtNum(lp.y)+'</text>';
+  s+='<text class="ax" x="'+(pts.length>1?L:X(0).toFixed(1))+'" y="'+(H-8)+'" text-anchor="'+(pts.length>1?'start':'middle')+'">'+mdate(pts[0].start)+'</text>';
+  if(pts.length>1)s+='<text class="ax" x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end">'+mdate(lp.start)+'</text>';
+  return s+'</svg>';
+}
+function calendar(key,md){
+  var a=key.split('-').map(Number),first=(new Date(a[0],a[1]-1,1).getDay()+6)%7,days=new Date(a[0],a[1],0).getDate();
+  var now=new Date(),todayD=mk(now.getTime())===key?now.getDate():-1;
+  var h='<div class="cal">'+['一','二','三','四','五','六','日'].map(function(w){return '<div class="w">'+w+'</div>'}).join('');
+  for(var i=0;i<first;i++)h+='<div class="c e"></div>';
+  for(var d=1;d<=days;d++){
+    var sec=md.days[d],cls='c'+(sec?(sec<1800?' l1':sec<3600?' l2':' l3'):'')+(d===todayD?' today':'');
+    h+='<div class="'+cls+'">'+d+'</div>';
+  }
+  return h+'</div><div class="legend">训练时长<span><i style="background:var(--accent-soft)"></i>&lt;30分</span><span><i style="background:var(--bar)"></i>30-60分</span><span><i style="background:var(--accent)"></i>&gt;1小时</span></div>';
+}
+function exProgress(){
+  var withHist=[];
+  state.exercises.forEach(function(ex){if(lastPerf(ex.id))withHist.push(ex)});
+  var seen={};withHist.forEach(function(e){seen[e.id]=1});
+  state.sessions.forEach(function(s){s.items.forEach(function(it){if(!seen[it.exId]){seen[it.exId]=1;withHist.push({id:it.exId,name:it.name,type:it.type})}})});
+  if(!withHist.length)return '<div class="empty">练过的动作会出现在这里，可以看每个动作的进步曲线。</div>';
+  if(!ui.exSel||!seen[ui.exSel])ui.exSel=withHist[0].id;
+  var ex=withHist.filter(function(e){return e.id===ui.exSel})[0];
+  var pts=[],type=ex.type;
+  state.sessions.slice().reverse().forEach(function(s){
+    s.items.forEach(function(it){
+      if(it.exId!==ex.id||!it.sets.length)return;
+      type=it.type;var b=bestOf(it.type,it.sets);
+      pts.push({start:s.start,set:b,n:it.sets.length,y:hasWeight(it.type)?b.w:b.r});
+    });
+  });
+  pts=pts.slice(-30);
+  var invert=type==='assist',unit=type==='time'?'秒':hasWeight(type)?'kg':'次';
+  var best=histBest(ex.id,type);
+  var f=pts[0],l=pts[pts.length-1],delta=l.y-f.y;
+  var good=invert?delta<0:delta>0;
+  var dTxt=pts.length<2?'再练一次就能看到变化':(delta===0?'没有变化':(good?'进步 ':'回落 ')+fmtNum(Math.abs(delta))+unit);
+  var h='<div class="sel-ex"><label class="k" for="ex-sel">选择动作</label><select id="ex-sel">'+withHist.map(function(e){return '<option value="'+e.id+'"'+(e.id===ex.id?' selected':'')+'>'+esc(e.name)+'</option>'}).join('')+'</select></div>';
+  h+='<div class="chart"><div class="cap">每次训练的最佳一组（'+(type==='assist'?'辅助重量，越少越靠上':hasWeight(type)?'重量':type==='time'?'秒数':'次数')+'，单位 '+unit+'）</div>'+lineChart(pts,invert)+'</div>';
+  h+='<div class="prog"><div class="tile"><span class="k">历史最佳</span><div class="v">'+esc(fmtSet(type,best))+'</div></div><div class="tile"><span class="k">首次 → 最近</span><div class="v">'+fmtNum(f.y)+' → '+fmtNum(l.y)+'</div><div class="d">'+dTxt+'</div></div></div>';
+  h+='<div class="hist">'+pts.slice().reverse().slice(0,6).map(function(p){return '<div><span>'+mdate(p.start)+' · '+p.n+' 组</span><span>最佳 '+esc(fmtSet(type,p.set))+'</span></div>'}).join('')+'</div>';
+  return h;
+}
+function bodyPanel(){
+  var h='<h2 class="sec">身体数据</h2><section class="bodybox"><div class="fld"><label for="bd-date">日期</label><input id="bd-date" type="date" value="'+ymd(Date.now())+'"></div><div class="bodygrid">'+[['weight','体重 kg'],['fat','体脂率 %'],['chest','胸围 cm'],['waist','腰围 cm'],['hip','臀围 cm']].map(function(x){return '<div class="fld"><label for="bd-'+x[0]+'">'+x[1]+'</label><input id="bd-'+x[0]+'" type="number" step="0.1" inputmode="decimal"></div>'}).join('')+'</div><div class="fld"><label for="bd-note">备注</label><input id="bd-note" maxlength="80" placeholder="例如：早晨空腹测量"></div><button class="btn primary" data-act="savebody">保存身体数据</button></section>';
+  if(state.body.length)h+='<div class="hist">'+state.body.slice().sort(function(a,b){return b.date.localeCompare(a.date)}).map(function(x){return '<div><span>'+esc(x.date)+' · '+(x.weight==null?'体重 -':('体重 '+x.weight+' kg'))+'</span><span>'+ (x.fat==null?'':('体脂 '+x.fat+'%')) +(x.waist==null?'':(' · 腰围 '+x.waist+'cm'))+'</span></div>'}).join('')+'</div>';
+  else h+='<p class="note">记录体重、体脂和围度，观察长期变化。</p>';
+  return h;
+}
+function viewStats(){
+  if(!state.sessions.length)return '<div class="empty">完成第一次训练后，这里会显示每月训练时间、训练日历和各动作的进步曲线。</div>'+bodyPanel();
+  var cur=mk(Date.now()),key=ui.month,md=monthData(key),prev=monthData(shiftMonth(key,-1));
+  var keys=[];for(var i=11;i>=0;i--)keys.push(shiftMonth(cur,-i));
+  var vals=keys.map(function(k){return monthData(k).dur});
+  var dd=prev.dur?md.dur-prev.dur:null;
+  var h='<div class="mnav"><button class="btn" data-act="month" data-d="-1" aria-label="上个月">‹</button><b>'+ymLabel(key)+'</b><button class="btn" data-act="month" data-d="1" aria-label="下个月"'+(key>=cur?' disabled':'')+'>›</button></div>';
+  var ms=monthSay(key,md,prev,cur);
+  if(ms)h+='<div class="cheer" style="margin-bottom:12px">'+esc(ms)+'</div>';
+  h+='<div class="tiles"><div class="tile"><span class="k">训练时长</span><div class="v">'+durHtml(md.dur)+'</div>'+(dd!==null?'<div class="d">较上月 '+(dd>=0?'+':'−')+fmtDur(Math.abs(dd))+'</div>':'')+'</div>'+
+    '<div class="tile"><span class="k">训练次数</span><div class="v"><b>'+md.n+'</b><small>次</small></div></div>'+
+    '<div class="tile"><span class="k">总组数</span><div class="v"><b>'+md.sets+'</b><small>组</small></div></div>'+
+    '<div class="tile"><span class="k">平均每次</span><div class="v">'+(md.n?durHtml(md.dur/md.n):'<b>0</b><small>分钟</small>')+'</div></div></div>';
+  h+='<h2 class="sec">训练日历</h2>'+calendar(key,md);
+  h+='<h2 class="sec">每月训练时间<span>单位：小时，点柱子切换月份</span></h2><div class="chart">'+barChart(keys,vals,key)+'</div>';
+  h+='<h2 class="sec">动作进步</h2>'+exProgress();
+  h+=bodyPanel();
+  return h;
+}
+
+/* ---------- 动作库 ---------- */
+function viewLib(){
+  var h='<button class="btn primary big" data-act="newex" data-add="0">＋ 新建动作</button><input type="text" id="lib-q" class="srch" placeholder="搜索动作，例如 卧推、背、腿" autocomplete="off" aria-label="搜索动作">';
+  if(!state.exercises.length)h+='<div class="empty">动作库是空的，新建一个动作开始吧。</div>';
+  GROUPS.forEach(function(g){
+    var list=state.exercises.filter(function(e){return (e.group||'其他')===g});
+    if(!list.length)return;
+    h+='<h2 class="sec" data-g="1">'+g+'</h2>'+list.map(function(e){
+      var b=histBest(e.id,e.type);
+      var def=e.sets+' 组 · '+(e.type==='time'?e.reps+' 秒':e.reps+' 次')+(hasWeight(e.type)?' · '+fmtNum(e.w)+'kg':'')+' · 休息 '+e.rest+' 秒';
+      return '<button class="pick" data-act="editex" data-id="'+e.id+'" data-q="'+esc((e.name+' '+g+' '+TYPES[e.type]).toLowerCase())+'"><span class="rowm"><b>'+esc(e.name)+' <span class="tag">'+TYPES[e.type]+'</span></b><span>'+def+(b?' · 最佳 '+esc(fmtSet(e.type,b)):'')+'</span></span><span class="tg">编辑</span></button>';
+    }).join('');
+  });
+  if(state.templates.length){
+    h+='<h2 class="sec">训练模板</h2>'+state.templates.map(function(t){
+      return '<div class="row"><div class="rowm"><b>'+esc(t.name)+'</b><span>'+esc(t.items.map(function(i){return i.name+' '+i.sets+'组'}).join('、'))+'</span></div><button class="btn sm" data-act="tmpldel" data-id="'+t.id+'">删除</button></div>';
+    }).join('');
+  }
+  h+='<p class="note" style="margin-top:20px">结束一次训练时填写模板名称，就能把这次的动作和组数存成模板，下次在“训练”页一键开始。</p>';
+  return h;
+}
+
+/* ---------- 弹层 ---------- */
+function openSheet(html){var s=$('#sheet');s.innerHTML='<div class="scrim" data-act="closesheet"><div class="panel" role="dialog" aria-modal="true">'+html+'</div></div>';s.hidden=false}
+function closeSheet(){var s=$('#sheet');s.hidden=true;s.innerHTML=''}
+function openPicker(){
+  var a=state.active,inS={};a.items.forEach(function(i){inS[i.exId]=1});
+  var h='<div class="pstick"><div class="ph"><h3>添加动作</h3><button class="btn sm primary" data-act="close">完成</button></div><input type="text" id="pk-q" class="srch" placeholder="搜索动作，例如 卧推、背、腿" autocomplete="off" aria-label="搜索动作"></div><button class="btn" data-act="newex" data-add="1">＋ 新建动作</button><div>'+recentRows(inS);
+  if(!state.exercises.length)h+='<div class="empty">动作库是空的，先新建一个动作。</div>';
+  GROUPS.forEach(function(g){
+    var list=state.exercises.filter(function(e){return (e.group||'其他')===g});
+    if(!list.length)return;
+    h+='<div class="grp">'+g+'</div>'+list.map(function(e){return pickRow(e,inS)}).join('');
+  });
+  h+='</div>';
+  openSheet(h);
+}
+function openEditor(id,addToSession){
+  var ex=id?state.exercises.filter(function(e){return e.id===id})[0]:null;
+  var e=ex||{name:'',group:'背',type:'weight',sets:4,reps:8,w:20,rest:90,step:2.5};
+  var h='<h3>'+(ex?'编辑动作':'新建动作')+'</h3>'+
+  '<div><label class="l" for="e-name">动作名称</label><input type="text" id="e-name" value="'+esc(e.name)+'" placeholder="例如：引体向上" maxlength="30"></div>'+
+  '<div><label class="l" for="e-group">部位</label><select id="e-group">'+GROUPS.map(function(g){return '<option'+(g===e.group?' selected':'')+'>'+g+'</option>'}).join('')+'</select></div>'+
+  '<div><span class="l" style="display:block;font-size:12.5px;color:var(--ink2);margin-bottom:4px">记录方式</span><div class="seg">'+
+  [['weight','负重'],['assist','辅助'],['bw','自重'],['time','计时']].map(function(t){return '<label><input type="radio" name="e-type" value="'+t[0]+'"'+(t[0]===e.type?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div>'+
+  '<p id="e-hint" style="margin-top:6px"></p></div>'+
+  '<div class="two"><div><label class="l" for="e-sets">默认组数</label><input type="number" id="e-sets" inputmode="numeric" value="'+e.sets+'" min="1"></div>'+
+  '<div><label class="l" for="e-reps" id="e-repl">默认次数</label><input type="number" id="e-reps" inputmode="numeric" value="'+e.reps+'" min="1"></div></div>'+
+  '<div class="two" id="e-wrow"><div><label class="l" for="e-w" id="e-wl">默认重量 kg</label><input type="number" id="e-w" inputmode="decimal" value="'+fmtNum(e.w)+'" min="0" step="any"></div>'+
+  '<div><label class="l" for="e-step">加减步进 kg</label><select id="e-step">'+[1,2.5,5,10].map(function(v){return '<option value="'+v+'"'+(v===(e.step||2.5)?' selected':'')+'>'+v+'</option>'}).join('')+'</select></div></div>'+
+  '<div><label class="l" for="e-rest">默认休息 (秒)</label><input type="number" id="e-rest" inputmode="numeric" value="'+e.rest+'" min="0"></div>'+
+  '<button class="btn primary" data-act="saveex" data-id="'+(ex?ex.id:'')+'" data-add="'+(addToSession?1:0)+'">保存</button>'+
+  (ex?'<button class="btn danger" data-act="delex" data-id="'+ex.id+'">删除这个动作</button><p>删除后，历史记录里的这个动作仍然保留。</p>':'<button class="btn" data-act="close">取消</button>');
+  openSheet(h);syncEditor();
+}
+function syncEditor(){
+  var t=($('input[name="e-type"]:checked')||{}).value||'weight',hint={weight:'记录重量和次数，例如 40kg × 8。',assist:'配重辅助的动作，记录辅助重量和次数。辅助越少说明越强，例如 辅助 80kg × 8。',bw:'只记录次数，例如俯卧撑。',time:'只记录秒数，例如平板支撑。'};
+  $('#e-hint').textContent=hint[t];
+  $('#e-wrow').hidden=!hasWeight(t);
+  $('#e-wl').textContent=t==='assist'?'默认辅助重量 kg':'默认重量 kg';
+  $('#e-repl').textContent=t==='time'?'默认秒数':'默认次数';
+}
+function saveExercise(id,add){
+  var name=$('#e-name').value.trim();
+  if(!name){toast('先填写动作名称');return}
+  var t=$('input[name="e-type"]:checked').value;
+  var o={name:name,group:$('#e-group').value,type:t,sets:Math.max(1,Math.round(num($('#e-sets').value))||1),reps:Math.max(1,Math.round(num($('#e-reps').value))||1),w:hasWeight(t)?Math.max(0,num($('#e-w').value)):0,rest:Math.max(0,Math.round(num($('#e-rest').value))),step:num($('#e-step').value)||2.5};
+  var ex;
+  if(id){ex=state.exercises.filter(function(e){return e.id===id})[0];Object.assign(ex,o)}
+  else{ex=Object.assign({id:'x-'+uid()},o);state.exercises.push(ex)}
+  if(add&&state.active&&!state.active.items.some(function(i){return i.exId===ex.id}))state.active.items.push(makeItem(ex));
+  touch();closeSheet();render();toast(id?'已保存':'已添加动作');
+}
+function openFinish(){
+  var a=state.active,done=a.items.reduce(function(n,i){return n+i.sets.length},0),mins=Math.max(1,Math.round((Date.now()-a.start)/60000));
+  var h='<h3>结束训练</h3><p>'+a.items.filter(function(i){return i.sets.length}).length+' 个动作，共 '+done+' 组'+(done?'':'。还没有记录任何一组。')+'</p>'+
+  (done?'<div class="cheer">'+esc(finishSay(done,mins))+'</div>':'')+'<div><label class="l" for="f-min">总训练时间 (分钟)</label><input type="number" id="f-min" inputmode="numeric" value="'+mins+'" min="1"><p style="margin-top:4px">已按开始到现在计算，可以手动改。</p></div>'+
+  '<div><label class="l" for="f-note">备注 (可选)</label><input type="text" id="f-note" maxlength="80" placeholder="例如：状态不错，引体加了一组"></div>'+
+  '<div><label class="l" for="f-tpl">存为训练模板 (可选，填名称即保存)</label><input type="text" id="f-tpl" maxlength="20" placeholder="例如：拉日"></div>'+
+  '<button class="btn primary" data-act="savewk"'+(done?'':' disabled')+'>保存训练</button>'+
+  '<button class="btn" data-act="close">继续训练</button>'+
+  '<button class="btn danger" data-act="discard">放弃本次训练</button>';
+  openSheet(h);
+}
+function saveWorkout(){
+  var a=state.active,mins=Math.max(1,Math.round(num($('#f-min').value))||1);
+  var items=a.items.filter(function(i){return i.sets.length}).map(function(i){return {exId:i.exId,name:i.name,group:i.group,type:i.type,sets:i.sets}});
+  var s={id:String(a.start),start:a.start,end:a.start+mins*60000,dur:mins*60,note:$('#f-note').value.trim(),items:items};
+  var tn=$('#f-tpl').value.trim();
+  if(tn)state.templates.push({id:'t-'+uid(),name:tn,items:a.items.filter(function(i){return i.sets.length}).map(function(i){return {exId:i.exId,name:i.name,sets:Math.max(i.target,i.sets.length)}})});
+  state.sessions=state.sessions.filter(function(x){return x.id!==s.id});
+  state.sessions.unshift(s);state.sessions.sort(function(x,y){return y.start-x.start});
+  state.active=null;ui.open[s.id]=true;ui.tab='log';ui.month=mk(s.start);
+  putSession(s);touch();closeSheet();render();window.scrollTo(0,0);
+  toast('已保存，本次 '+fmtDur(s.dur)+'。'+milestoneSay());
+}
+function openSettings(){
+  var st=ui.sync==='cloud'?'数据保存在你的账号里，换手机或电脑登录后也能看到。':ui.sync==='err'?'云端保存暂时失败，数据先留在这台设备上，稍后会再试。':'数据只保存在这台设备的浏览器里，清除浏览器数据会丢失。建议经常导出备份。';
+  var h='<h3>设置</h3>'+
+  '<label class="tog"><span>休息结束提示音</span><input type="checkbox" data-set="sound"'+(state.settings.sound?' checked':'')+'></label>'+
+  '<label class="tog"><span>休息结束振动 (部分手机支持)</span><input type="checkbox" data-set="vibrate"'+(state.settings.vibrate?' checked':'')+'></label>'+
+  '<button class="btn" data-act="testsound">试听提示音</button>'+
+  '<div class="note">训练中会尽量保持屏幕常亮。锁屏或切到其他应用后，网页可能无法准时响铃，回到本页会马上提示。</div>'+
+  '<div class="note">'+st+'</div>';
+  h+='<button class="btn" data-act="export">导出备份 (JSON)</button><button class="btn" data-act="exportcsv">导出训练记录 (CSV，可用 Excel 打开)</button>'; 
+  h+='<div><label class="l" for="f-import">导入备份 (JSON)</label><input type="file" id="f-import" accept=".json,application/json"></div>'+
+  '<button class="btn danger" data-act="clearall">清空所有数据</button><button class="btn primary" data-act="close">完成</button>';
+  openSheet(h);
+}
+function saveFile(name,data){
+  if(caps.dl){caps.dl.save({filename:name,data:data}).then(function(){toast('已保存')}).catch(function(){browserSave(name,data)});return}
+  browserSave(name,data);
+}
+function browserSave(name,data){var blob=new Blob([data],{type:'application/octet-stream;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1500);toast('备份文件已导出');}
+function exportJson(){saveFile('lin-de-xun-backup-'+ymd(Date.now())+'.json',JSON.stringify({app:'lin-de-xun',version:1,exportedAt:Date.now(),meta:metaOf(),sessions:state.sessions}))}
+function exportCsv(){
+  var rows=[['日期','开始时间','总时长(分钟)','动作','类型','第几组','重量kg','次数或秒数']];
+  state.sessions.slice().reverse().forEach(function(s){s.items.forEach(function(it){it.sets.forEach(function(x,k){rows.push([ymd(s.start),fmtTime(s.start),Math.round(s.dur/60),it.name,TYPES[it.type],k+1,hasWeight(it.type)?x.w:'',x.r])})})});
+  saveFile('zushuben-records-'+ymd(Date.now())+'.csv','﻿'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'));
+}
+function importJson(file){
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var o=JSON.parse(rd.result);
+      if(!o||!Array.isArray(o.sessions))throw new Error('x');
+      var have={};state.sessions.forEach(function(s){have[s.id]=1});
+      var add=0;
+      o.sessions.forEach(function(s){if(s&&s.id&&s.items&&!have[s.id]){state.sessions.push(s);putSession(s);add++}});
+      state.sessions.sort(function(a,b){return b.start-a.start});
+      if(o.meta){
+        var ids={};state.exercises.forEach(function(e){ids[e.id]=1});
+        (o.meta.exercises||[]).forEach(function(e){if(!ids[e.id])state.exercises.push(e)});
+        var tids={};state.templates.forEach(function(t){tids[t.id]=1});
+        (o.meta.templates||[]).forEach(function(t){if(!tids[t.id])state.templates.push(t)});
+      }
+      touch();closeSheet();render();toast('已导入 '+add+' 次训练');
+    }catch(e){toast('这个文件不是林的训的备份')}
+  };
+  rd.readAsText(file);
+}
+function arm(el,text,fn){
+  if(el.dataset.armed){clearTimeout(+el.dataset.armed);delete el.dataset.armed;fn();return}
+  var old=el.textContent;el.textContent=text;
+  el.dataset.armed=setTimeout(function(){el.textContent=old;delete el.dataset.armed},3000);
+}
+
+/* ---------- 事件 ---------- */
+var H={
+  tab:function(el){ui.tab=el.dataset.t;render();window.scrollTo(0,0)},
+  settings:function(){openSettings()},
+  closesheet:function(el,e){if(e.target===el)closeSheet()},
+  close:function(){closeSheet()},
+  start:function(){if(state.active)return;startWorkout([]);openPicker()},
+  repeat:function(){var last=state.sessions[0];if(!last||state.active)return;startWorkout(last.items.map(function(it){return makeItem(exFromSnap(it),it.sets.length)}))},
+  tmpl:function(el){var t=state.templates.filter(function(x){return x.id===el.dataset.id})[0];if(!t||state.active)return;startWorkout(t.items.map(function(it){return makeItem(exFromSnap(it),it.sets)}))},
+  tmpldel:function(el){arm(el,'再点删除',function(){state.templates=state.templates.filter(function(x){return x.id!==el.dataset.id});touch();render()})},
+  newplan:function(){openPlanBuilder()},
+  manageplans:function(){managePlans()},
+  plancheck:function(el){var id=el.dataset.id;if(el.checked){if(ui.planDraft.indexOf(id)<0)ui.planDraft.push(id)}else ui.planDraft=ui.planDraft.filter(function(x){return x!==id})},
+  saveplan:function(){var name=$('#plan-name').value.trim();if(!name){toast('先填写计划名称');return}if(!ui.planDraft.length){toast('至少选择一个动作');return}var items=ui.planDraft.map(function(id){var ex=state.exercises.filter(function(e){return e.id===id})[0];return {exId:id,sets:ex.sets||3}});state.templates.push({id:'t-'+uid(),name:name,kind:'custom',items:items});touch();closeSheet();render();toast('训练计划已创建')},
+  adj:function(el){
+    var it=state.active.items[+el.dataset.i],k=el.dataset.k,d=+el.dataset.d;
+    var step=k==='w'?(it.step||2.5):(it.type==='time'?5:1);
+    var v=Math.max(0,Math.round((num(it[k])+d*step)*100)/100);
+    it[k]=v;var inp=$('#in-'+el.dataset.i+'-'+k);if(inp)inp.value=fmtNum(v);touch();
+  },
+  tgt:function(el){var it=state.active.items[+el.dataset.i];it.target=Math.max(it.sets.length||1,it.target+(+el.dataset.d));touch();render()},
+  done:function(el){completeSet(+el.dataset.i)},
+  undo:function(el){var a=state.active,it=a.items[+el.dataset.i];if(!it.sets.length)return;it.sets.pop();if(a.rest&&a.rest.name===it.name)a.rest=null;touch();render()},
+  rest:function(el){var it=state.active.items[+el.dataset.i];it.rest=+el.dataset.v;var ex=state.exercises.filter(function(e){return e.id===it.exId})[0];if(ex)ex.rest=it.rest;touch();render()},
+  rmitem:function(el){arm(el,'再点移除',function(){state.active.items.splice(+el.dataset.i,1);touch();render()})},
+  additem:function(){openPicker()},
+  pick:function(el){
+    var ex=state.exercises.filter(function(e){return e.id===el.dataset.id})[0];if(!ex||!state.active)return;
+    state.active.items.push(makeItem(ex));touch();render();
+    document.querySelectorAll('#sheet .pick[data-id="'+el.dataset.id+'"]').forEach(function(b){b.classList.add('added');b.disabled=true;b.querySelector('.tg').textContent='已添加'});
+  },
+  newex:function(el){openEditor(null,el.dataset.add==='1')},
+  editex:function(el){openEditor(el.dataset.id,false)},
+  saveex:function(el){saveExercise(el.dataset.id,el.dataset.add==='1')},
+  delex:function(el){arm(el,'再点一次确认删除',function(){state.exercises=state.exercises.filter(function(e){return e.id!==el.dataset.id});touch();closeSheet();render()})},
+  finish:function(){openFinish()},
+  savewk:function(){saveWorkout()},
+  discard:function(el){arm(el,'再点一次放弃',function(){state.active=null;touch();closeSheet();render()})},
+  'rest-adj':function(el){
+    var r=state.active&&state.active.rest;if(!r)return;
+    var d=+el.dataset.d,now=Date.now();
+    r.end=Math.max(now+1000,r.end+d*1000);r.total=Math.max(5,r.total+d);
+    if(r.end>now)alertedEnd=0;resetTitle();touch();tick();
+  },
+  'rest-skip':function(){if(state.active)state.active.rest=null;resetTitle();touch();renderDock()},
+  toggle:function(el){ui.open[el.dataset.id]=!ui.open[el.dataset.id];render()},
+  again:function(el){
+    if(state.active){toast('先结束正在进行的训练');return}
+    var s=state.sessions.filter(function(x){return x.id===el.dataset.id})[0];if(!s)return;
+    startWorkout(s.items.map(function(it){return makeItem(exFromSnap(it),it.sets.length)}));
+  },
+  delsess:function(el){arm(el,'再点一次删除',function(){state.sessions=state.sessions.filter(function(x){return x.id!==el.dataset.id});delSession(el.dataset.id);touch();render();toast('已删除这次训练')})},
+  month:function(el){var k=shiftMonth(ui.month,+el.dataset.d);if(k>mk(Date.now()))return;ui.month=k;render()},
+  pickmonth:function(el){ui.month=el.dataset.k;render()},
+  testsound:function(){unlockAudio();beep();if(state.settings.vibrate){try{if(navigator.vibrate)navigator.vibrate(200)}catch(e){}}},
+  export:function(){exportJson()},
+  exportcsv:function(){exportCsv()},
+  clearall:function(el){arm(el,'再点一次清空，无法恢复',function(){
+    var ids=state.sessions.map(function(s){return s.id});
+    ids.forEach(function(id){delSession(id)});
+    state=normalize(null,[]);touch();closeSheet();render();toast('已清空');
+  })}
+};
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');if(!el)return;
+  unlockAudio();
+  var f=H[el.dataset.act];if(f)f(el,e);
+});
+document.addEventListener('input',function(e){
+  if(e.target&&e.target.id==='plan-q'){applyFilter(e.target);return}
+  if(e.target.id==='pk-q'||e.target.id==='lib-q'){applyFilter(e.target);return}
+  var t=e.target;
+  if(t.dataset&&t.dataset.k&&t.dataset.i!==undefined&&state.active){
+    var it=state.active.items[+t.dataset.i];if(!it)return;
+    var v=parseFloat(t.value);if(isNaN(v)||v<0)return;
+    if(t.dataset.k==='rest'){
+      v=Math.round(v);it.rest=v;
+      var ex=state.exercises.filter(function(x){return x.id===it.exId})[0];if(ex)ex.rest=v;
+      var box=t.closest('.rest');if(box)box.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('on',+c.dataset.v===v)});
+    }else it[t.dataset.k]=v;
+    touch();
+  }
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.name==='e-type')syncEditor();
+  else if(t.dataset&&t.dataset.set){state.settings[t.dataset.set]=t.checked;touch()}
+  else if(t.id==='ex-sel'){ui.exSel=t.value;render()}
+  else if(t.id==='f-import'&&t.files&&t.files[0])importJson(t.files[0]);
+});
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'){
+    var r=state.active&&state.active.rest;
+    if(!r||r.end>Date.now())resetTitle();
+    syncWake();tick();
+  }
+});
+
+function render(){
+  $('#live').hidden=!state.active;
+  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===ui.tab);b.setAttribute('aria-current',b.dataset.t===ui.tab?'page':'false')});
+  $('#view').innerHTML=ui.tab==='train'?viewTrain():ui.tab==='log'?viewLog():ui.tab==='stats'?viewStats():viewLib();
+  renderDock();
+  tick();
+  syncWake();
+}
+render();
+if(migrated){touch();migrated=false}else{touch()}
+setInterval(tick,250);
+// 独立 PWA 使用本地存储，不连接云端。
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+})();
 </script>
+
 </body></html>
